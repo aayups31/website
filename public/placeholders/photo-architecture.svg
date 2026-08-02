@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Architecture photography placeholder</title>
+  <desc id="desc">An original high-contrast architectural study reserved for future photography.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#d8d4ca"/>
+      <stop offset="1" stop-color="#7d817f"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="3" seed="3"/>
+      <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .12 0"/>
+    </filter>
+  </defs>
+  <rect width="900" height="1200" fill="url(#sky)"/>
+  <path d="M0 1200V434L426 145v1055Z" fill="#101314"/>
+  <path d="M426 1200V145L900 0v1200Z" fill="#272a29"/>
+  <path d="M478 1200V300L826 184v1016Z" fill="#a9a69c" opacity=".3"/>
+  <path d="M0 874 426 534v94L0 1002ZM426 434 900 236v86L426 534Z" fill="#f2eee3" opacity=".65"/>
+  <g stroke="#ede8dc" opacity=".35">
+    <path d="M72 510v603M150 446v667M228 390v723M306 326v787M520 274v839M620 240v873M720 210v903"/>
+  </g>
+  <rect width="900" height="1200" filter="url(#grain)" opacity=".5"/>
+  <g fill="#fff" font-family="monospace" font-size="16" letter-spacing="4">
+    <text x="38" y="56">PHOTOGRAPHY STUDY / 01</text>
+    <text x="38" y="1162">FINAL PHOTOGRAPH FORTHCOMING</text>
+  </g>
+</svg>

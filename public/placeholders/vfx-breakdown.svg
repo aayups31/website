@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900" role="img" aria-labelledby="title desc">
+  <title id="title">VFX breakdown placeholder</title>
+  <desc id="desc">An original split-frame study reserved for a future before-and-after VFX breakdown.</desc>
+  <defs>
+    <linearGradient id="left" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#0b1017"/>
+      <stop offset="1" stop-color="#273444"/>
+    </linearGradient>
+    <linearGradient id="right" x1="0" y1="1" x2="1" y2="0">
+      <stop stop-color="#140d10"/>
+      <stop offset=".55" stop-color="#493126"/>
+      <stop offset="1" stop-color="#c5a377"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence baseFrequency=".9" numOctaves="2" seed="13"/>
+      <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .14 0"/>
+    </filter>
+  </defs>
+  <rect width="700" height="900" fill="url(#left)"/>
+  <rect x="700" width="700" height="900" fill="url(#right)"/>
+  <g fill="none" stroke="#dce8f5" opacity=".35">
+    <path d="M60 630 346 310l234 156 210-222 292 226 258-145" stroke-width="2"/>
+    <circle cx="346" cy="310" r="136"/>
+    <path d="M700 80v740" stroke-width="3"/>
+  </g>
+  <g stroke="#fff" opacity=".55">
+    <path d="M30 30h70M30 30v70M1370 30h-70M1370 30v70M30 870h70M30 870v-70M1370 870h-70M1370 870v-70"/>
+  </g>
+  <rect width="1400" height="900" filter="url(#grain)" opacity=".5"/>
+  <g fill="#fff" font-family="monospace" font-size="17" letter-spacing="4">
+    <text x="52" y="76">SOURCE</text>
+    <text x="1260" y="76">FINAL</text>
+    <text x="52" y="844">BREAKDOWN PLACEHOLDER / MEDIA PENDING</text>
+  </g>
+</svg>

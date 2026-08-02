@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">VFX projection placeholder</title>
+  <desc id="desc">An original monochrome light-volume study reserved for future VFX media.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#060709"/>
+      <stop offset="0.55" stop-color="#151820"/>
+      <stop offset="1" stop-color="#030405"/>
+    </linearGradient>
+    <radialGradient id="light" cx="68%" cy="42%" r="45%">
+      <stop offset="0" stop-color="#eff6ff" stop-opacity=".92"/>
+      <stop offset=".28" stop-color="#89a8e8" stop-opacity=".4"/>
+      <stop offset="1" stop-color="#122040" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="3" seed="8"/>
+      <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .11 0"/>
+    </filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="24"/></filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#light)"/>
+  <path d="M310 810 1030 112 1430 112 840 810Z" fill="#b9d0ff" opacity=".08" filter="url(#soft)"/>
+  <g fill="none" stroke="#dbe8ff" opacity=".3">
+    <ellipse cx="1085" cy="380" rx="260" ry="260" stroke-width="2"/>
+    <ellipse cx="1085" cy="380" rx="184" ry="184" stroke-width="1"/>
+    <path d="M825 380h520M1085 120v520" stroke-dasharray="2 14"/>
+  </g>
+  <path d="M120 700C390 490 535 556 742 408s344-236 738-156" fill="none" stroke="#d8e5ff" stroke-width="3" opacity=".55"/>
+  <rect width="1600" height="900" filter="url(#grain)" opacity=".55"/>
+  <g fill="#f4f7ff" font-family="monospace" font-size="18" letter-spacing="5">
+    <text x="58" y="70">PROJECTION STUDY / MEDIA FORTHCOMING</text>
+    <text x="1340" y="842">VFX / 01</text>
+  </g>
+</svg>

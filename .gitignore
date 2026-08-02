@@ -1,0 +1,31 @@
+# dependencies
+node_modules/
+
+# Next.js output
+.next/
+out/
+
+# test output
+coverage/
+playwright-report/
+test-results/
+qa/
+*.tsbuildinfo
+
+# local environment
+.env
+.env.*
+!.env.example
+
+# OS/editor
+.DS_Store
+*.swp
+
+# local source material containing private contact information
+Aayu_Resume.pdf
+portfolio.md
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
