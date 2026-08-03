@@ -6,7 +6,7 @@ const ExperienceShell = dynamic(
   () => import("./experience-shell").then((module) => module.ExperienceShell),
   {
     ssr: false,
-    loading: () => <div className="experience-fallback experience-fallback--loading" />,
+    loading: () => <div className="experience-fallback experience-fallback--loading" aria-hidden="true" />,
   },
 );
 

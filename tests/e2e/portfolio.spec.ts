@@ -11,10 +11,27 @@ test.describe("portfolio experience", () => {
     ).toBeVisible();
     await expect(page.locator("[data-world=football]")).toBeAttached();
     await expect(page.locator("[data-world=racing]")).toBeAttached();
-    await expect(page.locator("[data-world=psychological]")).toBeAttached();
+    await expect(page.locator("[data-world=music]")).toBeAttached();
     await expect(page.locator("[data-world=archive]")).toBeAttached();
-    await expect(page.getByText("Final media pending").first()).toBeAttached();
+    await expect(page.getByText("Final credited media pending").first()).toBeAttached();
+    await expect(page.locator("[data-cinematic-worlds]")).toBeAttached();
+    await expect(page.locator("canvas")).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Linkin Park" })).toBeAttached();
+    await expect(page.getByRole("heading", { name: "Hans Zimmer" })).toBeAttached();
+    await expect(page.getByRole("heading", { name: "Michael Jackson" })).toBeAttached();
+    await expect
+      .poll(() =>
+        page
+          .locator(".cinematic-world--prologue img")
+          .first()
+          .evaluate((image: HTMLImageElement) => image.naturalWidth),
+      )
+      .toBeGreaterThan(0);
     await expect(page.locator("body")).not.toContainText(/dark vfx/i);
+    await expect(page.locator("body")).not.toContainText(/psychological horror/i);
+
+    await page.locator("#music").scrollIntoViewIfNeeded();
+    await expect(page.locator("html")).toHaveAttribute("data-world", "music");
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
@@ -65,6 +82,7 @@ test.describe("portfolio experience", () => {
     await motionControl.click();
     await expect(motionControl).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator("html")).toHaveAttribute("data-motion", "reduced");
+    await expect(page.locator(".cinematic-layer").first()).toHaveCSS("transform", "none");
     await expect.poll(() => page.evaluate(() => localStorage.getItem("portfolio-motion"))).toBe(
       "reduced",
     );

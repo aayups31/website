@@ -82,8 +82,7 @@ button {
 }
 
 img,
-svg,
-canvas {
+svg {
   display: block;
   max-width: 100%;
 }
@@ -1112,34 +1111,47 @@ p {
   background: transparent;
 }
 
-.experience-canvas {
+.experience-stage {
+  --world-progress: 0.5;
+  --phase-intro: 0;
+  --phase-middle: 1;
+  --phase-outro: 0;
+  --music-linkin: 0;
+  --music-zimmer: 1;
+  --music-michael: 0;
+  --far-y: 0px;
+  --middle-y: 0px;
+  --near-y: 0px;
+  --velocity-x: 0px;
+  --velocity-x-reverse: 0px;
+  --far-scale: 1.07;
+  --middle-scale: 1.065;
+  --near-scale: 1.06;
   position: fixed;
   z-index: 0;
   inset: 0;
   overflow: hidden;
-  background: #05080d;
+  background: #030405;
+  contain: layout paint style;
+  isolation: isolate;
   opacity: 0;
   pointer-events: none;
   transition: opacity 1.4s var(--ease-out);
 }
 
-.experience-canvas[data-ready],
-.experience-canvas:has(.experience-fallback) {
+.experience-stage[data-ready],
+.experience-stage:has(.experience-fallback) {
   opacity: 1;
 }
 
-.experience-canvas canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
 .experience-fallback {
-  position: absolute;
+  position: fixed;
+  z-index: 0;
   inset: 0;
   background:
-    radial-gradient(ellipse at 50% 64%, rgba(38, 72, 133, 0.42), transparent 28%),
-    linear-gradient(128deg, transparent 18%, rgba(192, 212, 245, 0.08) 49%, transparent 72%),
-    #05080d;
+    radial-gradient(ellipse at 62% 52%, rgba(48, 74, 112, 0.34), transparent 31%),
+    linear-gradient(128deg, transparent 18%, rgba(214, 223, 240, 0.06) 49%, transparent 72%),
+    #030405;
 }
 
 .experience-fallback--loading::after {
@@ -1153,18 +1165,409 @@ p {
   text-transform: uppercase;
 }
 
-.canvas-vignette {
+.stage-vignette {
   position: absolute;
+  z-index: 14;
   inset: 0;
   background:
-    radial-gradient(ellipse at center, transparent 38%, rgba(3, 4, 5, 0.3) 76%, rgba(3, 4, 5, 0.78) 118%),
-    linear-gradient(to bottom, rgba(3, 4, 5, 0.3), transparent 20%, transparent 78%, rgba(3, 4, 5, 0.55));
+    radial-gradient(ellipse at center, transparent 27%, rgba(3, 4, 5, 0.2) 67%, rgba(3, 4, 5, 0.84) 118%),
+    linear-gradient(to right, rgba(3, 4, 5, 0.3), transparent 38%, transparent 72%, rgba(3, 4, 5, 0.36)),
+    linear-gradient(to bottom, rgba(3, 4, 5, 0.42), transparent 24%, transparent 69%, rgba(3, 4, 5, 0.72));
 }
 
 .transition-veil {
   position: absolute;
+  z-index: 15;
   inset: 0;
-  background: linear-gradient(112deg, transparent 15%, rgba(193, 208, 233, 0.04) 48%, transparent 72%);
+  background:
+    linear-gradient(112deg, transparent 15%, rgba(222, 229, 240, 0.055) 48%, transparent 72%),
+    linear-gradient(to right, rgba(3, 4, 5, 0.38), transparent 46%);
+  mix-blend-mode: screen;
+}
+
+.cinematic-worlds,
+.cinematic-world {
+  position: absolute;
+  inset: 0;
+}
+
+.cinematic-worlds {
+  overflow: hidden;
+  background: #030405;
+}
+
+.cinematic-world {
+  --world-light:
+    radial-gradient(circle at 68% 42%, rgba(131, 165, 221, 0.16), transparent 34%),
+    linear-gradient(110deg, rgba(2, 3, 4, 0.68) 4%, transparent 54%);
+  overflow: hidden;
+  background: #030405;
+  opacity: 0;
+  transform: scale(1.028);
+  transition: opacity 1.15s ease, transform 2.2s var(--ease-out);
+  will-change: opacity, transform;
+}
+
+html[data-world="prologue"] .cinematic-world--prologue,
+html[data-world="football"] .cinematic-world--football,
+html[data-world="racing"] .cinematic-world--racing,
+html[data-world="music"] .cinematic-world--music,
+html[data-world="archive"] .cinematic-world--archive,
+html[data-world="contact"] .cinematic-world--contact {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cinematic-layer {
+  position: absolute;
+  z-index: 1;
+  inset: -4%;
+  overflow: hidden;
+  backface-visibility: hidden;
+  transform: translate3d(var(--velocity-x), var(--far-y), 0) scale(var(--far-scale));
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.cinematic-layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cinematic-layer--middle {
+  z-index: 3;
+  transform: translate3d(var(--velocity-x-reverse), var(--middle-y), 0) scale(var(--middle-scale));
+}
+
+.cinematic-layer--near {
+  z-index: 5;
+  transform: translate3d(var(--velocity-x), var(--near-y), 0) scale(var(--near-scale));
+}
+
+.cinematic-layer--phase-intro {
+  opacity: var(--phase-intro);
+}
+
+.cinematic-layer--phase-middle {
+  opacity: var(--phase-middle);
+}
+
+.cinematic-layer--phase-outro {
+  opacity: var(--phase-outro);
+}
+
+.cinematic-layer--music-linkin {
+  opacity: var(--music-linkin);
+}
+
+.cinematic-layer--music-zimmer {
+  opacity: var(--music-zimmer);
+}
+
+.cinematic-layer--music-michael {
+  opacity: var(--music-michael);
+}
+
+.cinematic-world__light {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  background: var(--world-light);
+  pointer-events: none;
+}
+
+.cinematic-world__aperture {
+  position: absolute;
+  z-index: 9;
+  top: 9vh;
+  right: -27vw;
+  width: min(76rem, 75vw);
+  border: 1px solid rgba(237, 231, 216, 0.17);
+  border-radius: 50%;
+  aspect-ratio: 1;
+  box-shadow: 0 0 4rem rgba(222, 192, 137, 0.08);
+  opacity: 0.8;
+  transform: translate3d(var(--velocity-x-reverse), var(--far-y), 0);
+}
+
+.cinematic-world__label {
+  position: absolute;
+  z-index: 10;
+  top: calc(var(--header-h) + 7vh);
+  right: var(--page-pad);
+  margin: 0;
+  color: rgba(238, 234, 224, 0.42);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.cinematic-world__label::before {
+  display: inline-block;
+  width: 3rem;
+  height: 1px;
+  margin-right: 0.9rem;
+  background: currentColor;
+  content: "";
+  vertical-align: middle;
+}
+
+.cinematic-world__watermark {
+  position: absolute;
+  z-index: 7;
+  right: -0.04em;
+  bottom: -0.26em;
+  margin: 0;
+  color: rgba(240, 237, 229, 0.065);
+  font-family: var(--sans);
+  font-size: clamp(7rem, 17vw, 19rem);
+  font-weight: 260;
+  letter-spacing: -0.085em;
+  line-height: 0.72;
+  white-space: nowrap;
+  transform: translate3d(var(--velocity-x-reverse), var(--near-y), 0);
+}
+
+.cinematic-grain {
+  position: absolute;
+  z-index: 11;
+  inset: -40%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  opacity: 0.13;
+  animation: cinematic-grain 700ms steps(2) infinite;
+}
+
+.cinematic-scan {
+  position: absolute;
+  z-index: 12;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 49.8%, rgba(239, 229, 207, 0.055) 50%, transparent 50.2%);
+  background-size: 100% 5px;
+  mix-blend-mode: soft-light;
+  opacity: 0.22;
+}
+
+@keyframes cinematic-grain {
+  0% { transform: translate3d(-2%, -3%, 0); }
+  25% { transform: translate3d(3%, 1%, 0); }
+  50% { transform: translate3d(-1%, 3%, 0); }
+  75% { transform: translate3d(2%, -1%, 0); }
+  100% { transform: translate3d(-3%, 2%, 0); }
+}
+
+.cinematic-world--football {
+  --world-light:
+    radial-gradient(circle at 72% 26%, rgba(115, 151, 222, 0.3), transparent 25%),
+    linear-gradient(96deg, rgba(2, 4, 9, 0.82) 3%, transparent 58%);
+}
+
+.cinematic-world--racing {
+  --world-light:
+    radial-gradient(circle at 77% 58%, rgba(195, 68, 38, 0.22), transparent 27%),
+    linear-gradient(100deg, rgba(5, 4, 3, 0.84) 2%, transparent 61%);
+}
+
+.cinematic-world--music {
+  --world-light:
+    radial-gradient(circle at 66% 42%, rgba(221, 174, 98, 0.2), transparent 30%),
+    linear-gradient(105deg, rgba(3, 3, 4, 0.84) 1%, transparent 58%);
+}
+
+.cinematic-world--archive {
+  --world-light:
+    radial-gradient(circle at 74% 60%, rgba(40, 166, 215, 0.2), transparent 31%),
+    linear-gradient(100deg, rgba(3, 3, 6, 0.8) 2%, transparent 58%);
+}
+
+.cinematic-world--contact {
+  --world-light:
+    radial-gradient(circle at 58% 42%, rgba(192, 164, 112, 0.1), transparent 26%),
+    linear-gradient(100deg, rgba(3, 4, 5, 0.91), rgba(3, 4, 5, 0.46) 70%, rgba(3, 4, 5, 0.86));
+}
+
+.image--stadium-aerial img {
+  filter: brightness(0.5) saturate(0.66) contrast(1.14) hue-rotate(5deg);
+}
+
+.image--stadium-bowl,
+.image--football-bowl {
+  inset: 22% -6% -9% 31%;
+  mask-image: radial-gradient(ellipse at 58% 54%, #000 15%, rgba(0, 0, 0, 0.9) 44%, transparent 76%);
+}
+
+.image--stadium-bowl img,
+.image--football-bowl img {
+  filter: brightness(0.62) saturate(0.72) contrast(1.12);
+}
+
+.image--locker-threshold {
+  inset: 15% 45% -7% -4%;
+  mask-image: linear-gradient(100deg, #000 8%, rgba(0, 0, 0, 0.92) 56%, transparent 96%);
+  mix-blend-mode: screen;
+}
+
+.image--locker-threshold img {
+  filter: brightness(0.42) saturate(0.62) contrast(1.2);
+}
+
+.image--match-night img {
+  filter: brightness(0.47) saturate(0.78) contrast(1.14) hue-rotate(2deg);
+}
+
+.image--football-locker {
+  inset: 9% 35% 4% -7%;
+  clip-path: polygon(0 4%, 86% 0, 100% 84%, 14% 100%);
+  mask-image: linear-gradient(105deg, #000 12%, rgba(0, 0, 0, 0.94) 61%, transparent 98%);
+  mix-blend-mode: screen;
+}
+
+.image--football-locker img {
+  filter: brightness(0.55) saturate(0.78) contrast(1.12);
+}
+
+.image--football-pitch {
+  inset: 50% -3% -12% 54%;
+  border-radius: 50% 0 0;
+  mask-image: radial-gradient(ellipse at 60% 60%, #000 8%, rgba(0, 0, 0, 0.9) 47%, transparent 77%);
+  mix-blend-mode: screen;
+}
+
+.image--football-pitch img {
+  filter: brightness(0.62) saturate(0.54) contrast(1.18);
+}
+
+.image--racing-studio img {
+  filter: brightness(0.46) saturate(0.72) contrast(1.3);
+}
+
+.image--racing-garage {
+  inset: 7% 39% 0 -5%;
+  clip-path: polygon(0 0, 87% 5%, 100% 100%, 8% 94%);
+  mask-image: linear-gradient(102deg, #000 12%, rgba(0, 0, 0, 0.94) 58%, transparent 98%);
+}
+
+.image--racing-garage img {
+  filter: brightness(0.55) saturate(0.8) contrast(1.15);
+}
+
+.image--racing-corner {
+  inset: -8%;
+  mask-image: linear-gradient(112deg, transparent 4%, rgba(0, 0, 0, 0.78) 31%, #000 63%);
+}
+
+.image--racing-corner img {
+  filter: brightness(0.47) saturate(0.8) contrast(1.18);
+}
+
+.image--racing-track {
+  inset: -7%;
+  mask-image: linear-gradient(98deg, transparent 1%, rgba(0, 0, 0, 0.78) 34%, #000 66%);
+}
+
+.image--racing-track img {
+  filter: brightness(0.47) saturate(0.86) contrast(1.22);
+}
+
+.image--music-arena img {
+  filter: brightness(0.43) saturate(0.74) contrast(1.16) hue-rotate(3deg);
+}
+
+.image--music-linkin {
+  inset: -7%;
+  mask-image: radial-gradient(ellipse at 58% 51%, #000 9%, rgba(0, 0, 0, 0.96) 53%, transparent 88%);
+  mix-blend-mode: screen;
+}
+
+.image--music-linkin img {
+  filter: brightness(0.46) saturate(0.58) contrast(1.28);
+}
+
+.image--music-band {
+  inset: 52% 3% 7% 33%;
+  clip-path: polygon(3% 8%, 100% 0, 95% 88%, 0 100%);
+  mask-image: linear-gradient(to right, transparent, #000 14%, #000 82%, transparent);
+  mix-blend-mode: screen;
+}
+
+.image--music-band img {
+  filter: brightness(0.66) contrast(1.26);
+}
+
+.image--music-orchestra {
+  inset: -7%;
+  mask-image: linear-gradient(96deg, transparent 2%, rgba(0, 0, 0, 0.86) 33%, #000 73%);
+}
+
+.image--music-orchestra img {
+  filter: brightness(0.49) saturate(0.82) contrast(1.18);
+}
+
+.image--music-stars {
+  inset: 5% -6% 44% 48%;
+  mask-image: radial-gradient(ellipse, #000 11%, rgba(0, 0, 0, 0.82) 51%, transparent 78%);
+  mix-blend-mode: screen;
+}
+
+.image--music-stars img {
+  filter: brightness(0.63) saturate(0.76) contrast(1.15);
+}
+
+.image--music-michael {
+  inset: -10% -1% -12% 55%;
+  mask-image: linear-gradient(92deg, transparent 1%, rgba(0, 0, 0, 0.82) 31%, #000 72%, transparent 100%);
+  mix-blend-mode: screen;
+}
+
+.image--music-michael img {
+  filter: brightness(0.64) contrast(1.22);
+}
+
+.image--music-glove {
+  inset: 26% 68% 18% 7%;
+  border-radius: 50%;
+  mask-image: radial-gradient(circle, #000 7%, rgba(0, 0, 0, 0.86) 51%, transparent 73%);
+  mix-blend-mode: screen;
+}
+
+.image--music-glove img {
+  filter: brightness(0.52) contrast(1.25);
+}
+
+.image--archive-drift img {
+  filter: brightness(0.43) saturate(0.74) contrast(1.2);
+}
+
+.image--archive-parked {
+  inset: -8% 62% -9% 2%;
+  clip-path: polygon(8% 0, 100% 5%, 84% 100%, 0 93%);
+  mask-image: linear-gradient(to right, transparent, #000 16%, #000 83%, transparent);
+  mix-blend-mode: screen;
+}
+
+.image--archive-parked img {
+  filter: brightness(0.58) saturate(0.72) contrast(1.16);
+}
+
+.image--archive-engine {
+  inset: 31% 3% 3% 64%;
+  border-radius: 50% 46% 42% 58%;
+  mask-image: radial-gradient(ellipse, #000 11%, rgba(0, 0, 0, 0.94) 57%, transparent 76%);
+  mix-blend-mode: screen;
+}
+
+.image--archive-engine img {
+  filter: brightness(0.58) saturate(0.68) contrast(1.22);
+}
+
+.image--contact-stars img,
+.image--contact-aerial img {
+  filter: brightness(0.2) saturate(0.38) contrast(1.25);
+}
+
+.image--contact-aerial {
+  mask-image: radial-gradient(ellipse at center, #000, transparent 69%);
   mix-blend-mode: screen;
 }
 
@@ -1258,6 +1661,21 @@ p {
   justify-content: flex-end;
 }
 
+.hero-frame::before {
+  position: absolute;
+  z-index: 0;
+  right: -0.025em;
+  bottom: -0.2em;
+  color: rgba(241, 237, 227, 0.055);
+  content: "AAYU";
+  font-family: var(--sans);
+  font-size: clamp(10rem, 26vw, 30rem);
+  font-weight: 260;
+  letter-spacing: -0.11em;
+  line-height: 0.7;
+  pointer-events: none;
+}
+
 .hero-coordinate {
   position: absolute;
   top: calc(var(--header-h) + 5vh);
@@ -1274,9 +1692,9 @@ p {
   margin: 0;
   font-family: var(--sans);
   font-size: clamp(4rem, 10.5vw, 11.5rem);
-  font-weight: 440;
-  letter-spacing: -0.075em;
-  line-height: 0.78;
+  font-weight: 310;
+  letter-spacing: -0.082em;
+  line-height: 0.76;
   flex-direction: column;
 }
 
@@ -1392,9 +1810,9 @@ p {
   margin-bottom: 2.2rem;
   font-family: var(--display);
   font-size: clamp(4rem, 8.8vw, 9.3rem);
-  font-weight: 420;
-  letter-spacing: -0.075em;
-  line-height: 0.87;
+  font-weight: 390;
+  letter-spacing: -0.08em;
+  line-height: 0.84;
 }
 
 .world-intro > p:last-child {
@@ -1565,6 +1983,71 @@ p {
   font-size: 0.82rem;
 }
 
+.world-chapter--music .world-intro h2 {
+  max-width: 9ch;
+  font-family: var(--sans);
+  font-weight: 280;
+  letter-spacing: -0.09em;
+  line-height: 0.78;
+}
+
+.music-beat {
+  min-height: 108svh;
+}
+
+.music-artist {
+  position: relative;
+  isolation: isolate;
+}
+
+.music-artist__meta {
+  display: grid;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid rgba(236, 235, 230, 0.24);
+  border-bottom: 1px solid rgba(236, 235, 230, 0.12);
+  color: rgba(236, 235, 230, 0.57);
+  font-size: 0.61rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  grid-template-columns: 2.4rem 1fr auto;
+}
+
+.music-artist__meta span:nth-child(2) {
+  color: #dfbf87;
+}
+
+.music-artist__number {
+  position: absolute;
+  z-index: -1;
+  top: -0.46em;
+  right: -0.06em;
+  margin: 0;
+  color: rgba(236, 235, 230, 0.075);
+  font-family: var(--sans);
+  font-size: clamp(10rem, 20vw, 22rem);
+  font-weight: 260;
+  letter-spacing: -0.1em;
+  line-height: 0.8;
+}
+
+.music-artist h3 {
+  max-width: 8.5ch;
+  margin: clamp(3.5rem, 8vh, 6rem) 0 1.4rem;
+  font-family: var(--sans);
+  font-size: clamp(4.4rem, 9.7vw, 10rem);
+  font-weight: 285;
+  letter-spacing: -0.09em;
+  line-height: 0.78;
+}
+
+.music-artist > p:last-child {
+  max-width: 31rem;
+  margin: 0 0 0 auto;
+  color: rgba(236, 235, 230, 0.76);
+  font-size: clamp(1rem, 1.35vw, 1.22rem);
+}
+
 .archive-beat {
   min-height: 108svh;
 }
@@ -1637,9 +2120,9 @@ html[data-world="racing"] .chapter-rail a[aria-current] {
   color: #e1b886;
 }
 
-html[data-world="psychological"] .chapter-rail__index,
-html[data-world="psychological"] .chapter-rail a[aria-current] {
-  color: #d5d8ca;
+html[data-world="music"] .chapter-rail__index,
+html[data-world="music"] .chapter-rail a[aria-current] {
+  color: #dfbf87;
 }
 
 html[data-world="archive"] .chapter-rail__index,
@@ -1941,6 +2424,25 @@ html[data-world="archive"] .chapter-rail a[aria-current] {
     font-size: clamp(3.3rem, 15vw, 6rem);
   }
 
+  .music-artist h3 {
+    max-width: 9ch;
+    font-size: clamp(4.1rem, 18vw, 7.2rem);
+  }
+
+  .music-artist__meta {
+    gap: 0.65rem;
+    grid-template-columns: 2rem 1fr;
+  }
+
+  .music-artist__meta span:last-child {
+    grid-column: 2;
+  }
+
+  .music-artist__number {
+    top: -0.15em;
+    font-size: clamp(9rem, 45vw, 14rem);
+  }
+
   .beat-meta {
     flex-wrap: wrap;
   }
@@ -1966,10 +2468,68 @@ html[data-world="archive"] .chapter-rail a[aria-current] {
     margin-left: 0;
   }
 
-  .canvas-vignette {
+  .stage-vignette {
     background:
-      linear-gradient(to right, rgba(3, 4, 5, 0.75), transparent 68%),
-      linear-gradient(to bottom, rgba(3, 4, 5, 0.25), transparent 25%, transparent 63%, rgba(3, 4, 5, 0.8));
+      linear-gradient(to right, rgba(3, 4, 5, 0.78), transparent 78%),
+      linear-gradient(to bottom, rgba(3, 4, 5, 0.38), transparent 24%, transparent 58%, rgba(3, 4, 5, 0.86));
+  }
+
+  .cinematic-world__label {
+    display: none;
+  }
+
+  .cinematic-world__watermark {
+    bottom: -0.12em;
+    font-size: clamp(5.5rem, 27vw, 9rem);
+  }
+
+  .cinematic-world__aperture {
+    top: 20vh;
+    right: -56vw;
+    width: 120vw;
+  }
+
+  .cinematic-layer--optional {
+    display: none;
+  }
+
+  .image--stadium-aerial img {
+    object-position: 58% 54% !important;
+  }
+
+  .image--stadium-bowl,
+  .image--football-bowl {
+    inset: 30% -24% -4% 4%;
+  }
+
+  .image--football-locker,
+  .image--racing-garage {
+    inset: 15% 5% 5% -30%;
+  }
+
+  .image--racing-corner img,
+  .image--racing-track img {
+    object-position: 68% 50% !important;
+  }
+
+  .image--music-linkin {
+    inset: -4% -35% -4% -12%;
+  }
+
+  .image--music-orchestra {
+    inset: -4% -42% -4% -8%;
+  }
+
+  .image--music-michael {
+    inset: -8% -12% -10% 22%;
+  }
+
+  .image--archive-parked {
+    inset: -6% 22% -8% -13%;
+  }
+
+  .image--archive-engine {
+    inset: 38% -14% 1% 38%;
   }
 }
 
@@ -2006,6 +2566,23 @@ html[data-motion="reduced"] *::after {
   animation-iteration-count: 1 !important;
 }
 
-html[data-quality="low"] .transition-veil {
+html[data-motion="reduced"] .cinematic-world,
+html[data-motion="reduced"] .cinematic-layer,
+html[data-motion="reduced"] .cinematic-world__aperture,
+html[data-motion="reduced"] .cinematic-world__watermark {
+  transform: none !important;
+}
+
+html[data-motion="reduced"] .cinematic-grain {
+  animation: none;
+}
+
+html[data-quality="low"] .transition-veil,
+html[data-quality="low"] .cinematic-scan,
+html[data-quality="low"] .cinematic-layer--optional {
   display: none;
+}
+
+html[data-quality="low"] .cinematic-grain {
+  opacity: 0.07;
 }

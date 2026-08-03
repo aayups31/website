@@ -7,9 +7,6 @@ const nextConfig = {
     // server-side image upload/optimization path.
     unoptimized: true,
   },
-  experimental: {
-    optimizePackageImports: ["@react-three/drei", "three"],
-  },
   headers: async () => [
     {
       source: "/(.*)",

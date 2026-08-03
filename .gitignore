@@ -24,6 +24,7 @@ qa/
 # local source material containing private contact information
 Aayu_Resume.pdf
 portfolio.md
+Images/
 
 # debug logs
 npm-debug.log*

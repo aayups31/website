@@ -1,4 +1,4 @@
-import type { WorldId } from "@/lib/experience-store";
+import type { WorldId } from "./experience-store";
 
 export const scrollRuntime = {
   progress: 0,

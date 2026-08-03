@@ -1,7 +1,28 @@
 import { ExperienceLoader } from "@/components/experience/experience-loader";
 import { SiteHeader } from "@/components/site-header";
 import { ArrowLink } from "@/components/arrow-link";
-import { experience, projects, siteConfig, values } from "@/lib/content";
+import { experience, projects, siteConfig } from "@/lib/content";
+
+const musicInfluences = [
+  {
+    index: "01",
+    artist: "Linkin Park",
+    motif: "Pressure / release",
+    copy: "Melody, texture, and raw force occupying the same space. A reminder that precision does not have to erase feeling.",
+  },
+  {
+    index: "02",
+    artist: "Hans Zimmer",
+    motif: "Architecture / scale",
+    copy: "Sound built like a world: motifs accumulate, space opens, and a single pulse can carry an entire sequence.",
+  },
+  {
+    index: "03",
+    artist: "Michael Jackson",
+    motif: "Rhythm / control",
+    copy: "Every movement, pause, and silhouette feels intentional. The lesson is not spectacle alone; it is command of timing.",
+  },
+];
 
 export default function HomePage() {
   const f1Project = projects.find((project) => project.slug === "f1-strategy-engine")!;
@@ -140,37 +161,42 @@ export default function HomePage() {
         </section>
 
         <section
-          id="perspective"
-          className="world-chapter world-chapter--psychological"
-          data-world="psychological"
-          aria-labelledby="perspective-title"
+          id="music"
+          className="world-chapter world-chapter--music"
+          data-world="music"
+          aria-labelledby="music-title"
         >
           <div className="world-intro world-copy world-copy--left">
-            <p className="chapter-label"><span>03</span> Perspective</p>
-            <h2 id="perspective-title">The person behind the systems.</h2>
+            <p className="chapter-label"><span>03</span> Music</p>
+            <h2 id="music-title">Three artists. Three kinds of force.</h2>
             <p>
-              I’m drawn to systems in motion: a football match shaped before kickoff,
-              a race changing lap by lap, a network carrying pressure, and an image
-              deciding how a scene feels.
+              Linkin Park, Hans Zimmer, and Michael Jackson are the artists I return
+              to. Not as decoration—as lessons in tension, scale, rhythm, and release.
             </p>
           </div>
 
-          <article className="world-beat world-beat--right values-beat">
-            <div className="world-copy values-sequence">
-              {values.map((value) => (
-                <div key={value.index}>
-                  <span>{value.index}</span>
-                  <h3>{value.title}</h3>
-                  <p>{value.copy}</p>
+          {musicInfluences.map((influence, index) => (
+            <article
+              className={`world-beat music-beat world-beat--${index % 2 ? "left" : "right"}`}
+              key={influence.artist}
+            >
+              <div className="world-copy music-artist">
+                <div className="music-artist__meta">
+                  <span>{influence.index}</span>
+                  <span>{influence.motif}</span>
+                  <span>Listening influence</span>
                 </div>
-              ))}
-            </div>
-          </article>
+                <p className="music-artist__number" aria-hidden="true">{influence.index}</p>
+                <h3>{influence.artist}</h3>
+                <p>{influence.copy}</p>
+              </div>
+            </article>
+          ))}
 
           <div className="world-closing world-copy world-copy--left">
             <p className="closing-line">
-              Studying Computer Science at the University of Waterloo. Interested in
-              software, machine learning, product, systems, and creative technology.
+              Build. Release. Rhythm. Atmosphere. The same instincts follow me into
+              products, systems, images, and motion.
             </p>
             <ArrowLink href="/about">More about Aayu</ArrowLink>
           </div>
@@ -186,9 +212,9 @@ export default function HomePage() {
             <p className="chapter-label"><span>04</span> Image</p>
             <h2 id="image-title">A different kind of system: the image.</h2>
             <p>
-              A projection archive for VFX work and photography. The structure is
-              ready; final media, roles, credits, and breakdowns will replace these
-              original placeholder studies when supplied.
+              A cinematic shell for VFX work and photography. These supplied visual
+              studies establish the motion language; final credited shots, roles,
+              captions, and breakdowns can replace them without redesigning the world.
             </p>
           </div>
 
@@ -203,7 +229,7 @@ export default function HomePage() {
                 A projection-led space for finished shots, before-and-after
                 breakdowns, and process—presented one sequence at a time.
               </p>
-              <p className="placeholder-caption">Placeholder frame · Final media pending</p>
+              <p className="placeholder-caption">Motion study · Final credited media pending</p>
             </div>
           </article>
 
@@ -218,7 +244,7 @@ export default function HomePage() {
                 An editorial sequence for photographs, captions, and context—paced
                 like a contact sheet rather than a tiled gallery.
               </p>
-              <p className="placeholder-caption">Placeholder study · Final photographs pending</p>
+              <p className="placeholder-caption">Image study · Final photographic series pending</p>
             </div>
           </article>
 

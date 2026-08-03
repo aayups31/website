@@ -7,7 +7,7 @@ const frequencies: Record<WorldId, number> = {
   prologue: 42,
   football: 55,
   racing: 73,
-  psychological: 38,
+  music: 61,
   archive: 64,
   contact: 48,
 };

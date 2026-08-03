@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { archiveItems, experience, projects, siteConfig } from "./content";
+import { archiveItems, experience, projects, siteConfig, values } from "./content";
 
 describe("portfolio content", () => {
   it("uses unique project slugs and indices", () => {
@@ -19,7 +19,8 @@ describe("portfolio content", () => {
   });
 
   it("never uses the retired creative alias", () => {
-    const serialized = JSON.stringify({ archiveItems, experience, projects, siteConfig });
+    const serialized = JSON.stringify({ archiveItems, experience, projects, siteConfig, values });
     expect(serialized.toLowerCase()).not.toContain("dark vfx");
+    expect(serialized.toLowerCase()).not.toContain("psychological horror");
   });
 });

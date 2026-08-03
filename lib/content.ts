@@ -288,7 +288,7 @@ export const values = [
   {
     index: "04",
     title: "Keep curiosity in the loop",
-    copy: "Football, Formula 1, film, psychological horror, photography, and VFX reshape how I think about timing, atmosphere, and detail.",
+    copy: "Football, Formula 1, film, photography, VFX, and the music of Linkin Park, Hans Zimmer, and Michael Jackson reshape how I think about timing, atmosphere, and detail.",
   },
 ];
 
