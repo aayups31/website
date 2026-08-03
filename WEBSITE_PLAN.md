@@ -98,7 +98,7 @@ The imagery falls toward near-black. Oversized typography and direct contact act
 - No bordered glass panels, dashboard chrome, or rounded containers around chapter copy.
 - Images occupy the viewport and enter through gradients, soft masks, asymmetric crops, and elliptical apertures.
 - Typography uses large low-weight forms, severe line-height, small technical labels, and occasional warm-gold accents.
-- IBM Plex Sans and Bodoni Moda remain the core pairing; hierarchy and composition create the cinematic character.
+- Anybody Variable provides a distinctive width-axis display voice; Newsreader Variable is reserved for editorial and italic moments. Technical labels use a system mono stack.
 - Grain and scan texture stay subtle and are reduced on lower-quality devices.
 - Text contrast comes from localized light falloff and image grading, not opaque boxes.
 
@@ -107,10 +107,12 @@ The imagery falls toward near-black. Oversized typography and direct contact act
 The fixed DOM stage mounts the active world and its immediate neighbors. Scroll handling:
 
 1. Finds the semantic chapter crossing a viewport focus line.
-2. Updates the active world only when the chapter changes.
-3. Damps local progress and velocity with `requestAnimationFrame`.
-4. Writes CSS custom properties directly to the stage.
-5. Uses those properties for GPU-friendly transforms, opacity, and chapter-specific image timing.
+2. Measures the intro, article, and closing beats inside that chapter.
+3. Maps the active beat onto one of 23 shot timelines with independent camera frames.
+4. Damps section progress, beat progress, velocity, and pointer depth with frame-rate-independent `requestAnimationFrame` motion.
+5. Writes camera and shot CSS custom properties directly to the stage for GPU-friendly pan, tilt, dolly, roll, scale, depth, and short cut transitions.
+
+A layout-level route controller publishes scroll, velocity, pointer, reveal, parallax, and magnetic variables for every supporting page. Each route receives a quieter full-viewport two-plane atmosphere so the motion language continues beyond the homepage without competing with long-form content.
 
 No React state is updated per animation frame. There is no homepage canvas or WebGL dependency.
 
@@ -118,7 +120,7 @@ Quality behavior:
 
 - High/medium: base, middle, near, and selected detail layers
 - Low/mobile: base and essential story layers; optional details are not mounted
-- Reduced motion: static transforms, immediate state updates, no grain animation
+- Reduced motion: fixed poster frames, static route plates, immediate reveal states, and no grain or pointer animation
 
 Sound remains opt-in and uses a restrained procedural tone; no copyrighted recordings are bundled.
 

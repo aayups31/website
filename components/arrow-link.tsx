@@ -24,17 +24,25 @@ export function ArrowLink({
         href={href}
         target={opensNewTab ? "_blank" : undefined}
         rel={opensNewTab ? "noreferrer" : undefined}
+        data-magnetic="link"
+        data-reveal="link"
       >
-        <span>{children}</span>
-        <span aria-hidden="true">↗</span>
+        <span className="arrow-link__label">
+          <span className="arrow-link__label-current">{children}</span>
+          <span className="arrow-link__label-next" aria-hidden="true">{children}</span>
+        </span>
+        <span className="arrow-link__arrow" aria-hidden="true">↗</span>
       </a>
     );
   }
 
   return (
-    <Link className={classes} href={href}>
-      <span>{children}</span>
-      <span aria-hidden="true">↗</span>
+    <Link className={classes} href={href} data-magnetic="link" data-reveal="link">
+      <span className="arrow-link__label">
+        <span className="arrow-link__label-current">{children}</span>
+        <span className="arrow-link__label-next" aria-hidden="true">{children}</span>
+      </span>
+      <span className="arrow-link__arrow" aria-hidden="true">↗</span>
     </Link>
   );
 }

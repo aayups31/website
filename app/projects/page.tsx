@@ -14,14 +14,18 @@ export default function ProjectsPage() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content" className="page-shell">
+      <main id="main-content" className="page-shell" data-motion-route="projects">
         <PageIntro
           index="02"
           eyebrow="Selected projects"
           title={<>Systems in motion.</>}
           description="Products and prototypes built around data, decisions, ownership, and real-time behaviour. Ongoing work is labeled without invented outcomes."
         />
-        <section className="content-section content-section--quiet">
+        <section
+          className="content-section content-section--quiet motion-section"
+          data-motion-section="projects-index"
+          data-reveal="section"
+        >
           <ProjectIndex projects={projects} />
         </section>
       </main>

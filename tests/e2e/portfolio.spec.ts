@@ -50,6 +50,64 @@ test.describe("portfolio experience", () => {
     await expect(page.getByText(/without inventing race-prediction accuracy/i)).toBeVisible();
   });
 
+  test("scrubs camera shots continuously and carries motion onto supporting routes", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "desktop motion choreography check");
+    await page.goto("/");
+
+    const stage = page.locator(".experience-stage");
+    await expect(stage).toHaveAttribute("data-ready", "true");
+    const openingScale = await stage.evaluate((element) =>
+      element.style.getPropertyValue("--cam-scale"),
+    );
+
+    await page.locator("#performance").evaluate((element) => {
+      const section = element as HTMLElement;
+      window.scrollTo(0, section.offsetTop + section.offsetHeight * 0.36);
+    });
+    await expect.poll(() => stage.getAttribute("data-camera-world")).toBe("football");
+    await expect
+      .poll(() => stage.evaluate((element) => element.style.getPropertyValue("--cam-scale")))
+      .not.toBe(openingScale);
+
+    const footballShot = page.locator('[data-cinematic-shot="football-locker"]');
+    await expect
+      .poll(() => footballShot.evaluate((element) => element.style.getPropertyValue("--shot-scale")))
+      .not.toBe("");
+    await expect
+      .poll(() => footballShot.evaluate((element) => element.style.getPropertyValue("--shot-x")))
+      .not.toBe("0vw");
+
+    await page.goto("/projects");
+    const atmosphere = page.locator('[data-route-atmosphere="projects"]');
+    await expect(atmosphere).toBeAttached();
+    const farLayer = atmosphere.locator(".route-atmosphere__layer--far");
+    const routeStartTransform = await farLayer.evaluate(
+      (element) => getComputedStyle(element).transform,
+    );
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight * 0.45));
+    await expect
+      .poll(() => farLayer.evaluate((element) => getComputedStyle(element).transform))
+      .not.toBe(routeStartTransform);
+
+    const projectLink = page.locator(".project-index a").first();
+    await projectLink.scrollIntoViewIfNeeded();
+    const box = await projectLink.boundingBox();
+    expect(box).not.toBeNull();
+    if (box) {
+      await projectLink.hover({
+        position: { x: box.width * 0.84, y: box.height * 0.35 },
+      });
+    }
+    await expect(projectLink).toHaveAttribute("data-motion-active", "true");
+    await expect
+      .poll(() =>
+        projectLink.evaluate((element) => element.style.getPropertyValue("--magnetic-x")),
+      )
+      .not.toBe("0px");
+  });
+
   test("labels every archive study as placeholder media", async ({ page }) => {
     await page.goto("/archive");
 
@@ -86,6 +144,13 @@ test.describe("portfolio experience", () => {
     await expect.poll(() => page.evaluate(() => localStorage.getItem("portfolio-motion"))).toBe(
       "reduced",
     );
+
+    await page.goto("/projects");
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "reduced");
+    await expect(page.locator(".route-atmosphere__layer--far")).toHaveCSS("transform", "none");
+    await expect(
+      page.locator(".utility-button").filter({ hasText: "Motion" }),
+    ).toHaveAttribute("aria-pressed", "true");
   });
 
   test("every public route responds without a page error", async ({ page }) => {
@@ -105,6 +170,11 @@ test.describe("portfolio experience", () => {
       const response = await routePage.goto(route, { waitUntil: "domcontentloaded" });
       expect(response?.status(), route).toBeLessThan(400);
       await expect(routePage.locator("main#main-content"), route).toBeVisible();
+      await expect(routePage.locator("[data-route-atmosphere]"), route).toBeAttached();
+      const overflow = await routePage.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow, `${route} horizontal overflow`).toBeLessThanOrEqual(1);
       await routePage.close();
     }
 

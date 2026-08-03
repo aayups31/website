@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource-variable/ibm-plex-sans";
-import "@fontsource-variable/bodoni-moda/opsz.css";
-import "@fontsource-variable/bodoni-moda/opsz-italic.css";
+import "@fontsource-variable/anybody/wdth.css";
+import "@fontsource-variable/anybody/wdth-italic.css";
+import "@fontsource-variable/newsreader/opsz.css";
+import "@fontsource-variable/newsreader/opsz-italic.css";
 import "./globals.css";
 import { siteConfig } from "@/lib/content";
+import { GlobalMotionController } from "@/components/motion/global-motion-controller";
+import { RouteAtmosphere } from "@/components/motion/route-atmosphere";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://aayups31.github.io/website";
@@ -74,6 +77,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
+        <GlobalMotionController />
+        <RouteAtmosphere />
         {children}
         <script
           type="application/ld+json"

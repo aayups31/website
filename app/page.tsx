@@ -34,14 +34,25 @@ export default function HomePage() {
       <SiteHeader immersive />
       <ExperienceLoader />
       <main id="main-content" className="cinematic-home">
-        <section className="chapter hero-chapter" data-world="prologue" aria-labelledby="hero-title">
+        <section
+          className="chapter hero-chapter"
+          data-world="prologue"
+          data-camera-beat="hero"
+          data-motion-section="hero"
+          aria-labelledby="hero-title"
+        >
           <div className="chapter-frame hero-frame">
             <p className="hero-coordinate">
               {siteConfig.name} · {siteConfig.location}
             </p>
-            <h1 id="hero-title">
-              <span>The work</span>
-              <span className="hero-title__serif">behind the moment.</span>
+            <h1
+              id="hero-title"
+              className="kinetic-heading kinetic-heading--hero"
+              data-motion-copy="The work behind the moment."
+              data-reveal="heading"
+            >
+              <span className="kinetic-heading__line">The work</span>
+              <span className="kinetic-heading__line hero-title__serif">behind the moment.</span>
             </h1>
             <p className="hero-deck">
               Founder and Computer Science student at the University of Waterloo,
@@ -65,9 +76,18 @@ export default function HomePage() {
           data-world="football"
           aria-labelledby="performance-title"
         >
-          <div className="world-intro world-copy world-copy--left">
+          <div
+            className="world-intro world-copy world-copy--left"
+            data-camera-beat="stadium"
+            data-reveal="section"
+          >
             <p className="chapter-label"><span>01</span> Performance</p>
-            <h2 id="performance-title">
+            <h2
+              id="performance-title"
+              className="kinetic-heading kinetic-heading--world"
+              data-motion-copy="What happens under the lights is built backstage."
+              data-reveal="heading"
+            >
               What happens under the lights is built backstage.
             </h2>
             <p>
@@ -81,6 +101,8 @@ export default function HomePage() {
               className={`world-beat world-beat--${index % 2 ? "left" : "right"}`}
               key={item.id}
               id={item.id === "ats" ? "ats" : undefined}
+              data-camera-beat={item.id}
+              data-reveal="section"
             >
               <div className="world-copy experience-copy">
                 <div className="beat-meta">
@@ -88,7 +110,13 @@ export default function HomePage() {
                   <span>{item.discipline}</span>
                   {item.status ? <span>{item.status}</span> : null}
                 </div>
-                <h3>{item.organisation}</h3>
+                <h3
+                  className="kinetic-heading kinetic-heading--beat"
+                  data-motion-copy={item.organisation}
+                  data-reveal="heading"
+                >
+                  {item.organisation}
+                </h3>
                 <p className="beat-role">{item.role} · {item.period}</p>
                 <p className="beat-summary">{item.summary}</p>
                 <ul className="evidence-lines">
@@ -99,7 +127,11 @@ export default function HomePage() {
             </article>
           ))}
 
-          <div className="world-closing world-copy world-copy--right">
+          <div
+            className="world-closing world-copy world-copy--right"
+            data-camera-beat="football-close"
+            data-reveal="section"
+          >
             <p className="closing-line">
               Product. Models. Infrastructure. Different arenas, one standard:
               make the system hold.
@@ -114,20 +146,41 @@ export default function HomePage() {
           data-world="racing"
           aria-labelledby="precision-title"
         >
-          <div className="world-intro world-copy world-copy--right">
+          <div
+            className="world-intro world-copy world-copy--right"
+            data-camera-beat="garage"
+            data-reveal="section"
+          >
             <p className="chapter-label"><span>02</span> Precision</p>
-            <h2 id="precision-title">Every signal changes the race.</h2>
+            <h2
+              id="precision-title"
+              className="kinetic-heading kinetic-heading--world"
+              data-motion-copy="Every signal changes the race."
+              data-reveal="heading"
+            >
+              Every signal changes the race.
+            </h2>
             <p>Projects about turning complex data into the next decision.</p>
           </div>
 
-          <article className="world-beat world-beat--left">
+          <article
+            className="world-beat world-beat--left"
+            data-camera-beat="f1-engine"
+            data-reveal="section"
+          >
             <div className="world-copy project-feature">
               <div className="beat-meta">
                 <span>Featured system</span>
                 <span>{f1Project.period}</span>
                 <span>{f1Project.status}</span>
               </div>
-              <h3>{f1Project.title}</h3>
+              <h3
+                className="kinetic-heading kinetic-heading--beat"
+                data-motion-copy={f1Project.title}
+                data-reveal="heading"
+              >
+                {f1Project.title}
+              </h3>
               <p className="beat-summary">{f1Project.summary}</p>
               <div className="signal-sequence" aria-label="F1 Strategy Engine capabilities">
                 {f1Project.evidence.map((item, index) => (
@@ -138,7 +191,11 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="world-beat world-beat--right">
+          <article
+            className="world-beat world-beat--right"
+            data-camera-beat="paired-projects"
+            data-reveal="section"
+          >
             <div className="world-copy paired-projects">
               {[financeProject, musicProject].map((project) => (
                 <div className="paired-project" key={project.slug}>
@@ -146,7 +203,13 @@ export default function HomePage() {
                     <span>{project.category}</span>
                     <span>{project.period}</span>
                   </div>
-                  <h3>{project.title}</h3>
+                  <h3
+                    className="kinetic-heading kinetic-heading--beat"
+                    data-motion-copy={project.title}
+                    data-reveal="heading"
+                  >
+                    {project.title}
+                  </h3>
                   <p>{project.summary}</p>
                   <ArrowLink href={`/projects/${project.slug}`}>View project</ArrowLink>
                 </div>
@@ -154,7 +217,11 @@ export default function HomePage() {
             </div>
           </article>
 
-          <div className="world-closing world-copy world-copy--left">
+          <div
+            className="world-closing world-copy world-copy--left"
+            data-camera-beat="racing-close"
+            data-reveal="section"
+          >
             <p className="closing-line">The data matters when it changes the decision.</p>
             <ArrowLink href="/projects">Explore all projects</ArrowLink>
           </div>
@@ -166,9 +233,20 @@ export default function HomePage() {
           data-world="music"
           aria-labelledby="music-title"
         >
-          <div className="world-intro world-copy world-copy--left">
+          <div
+            className="world-intro world-copy world-copy--left"
+            data-camera-beat="music-open"
+            data-reveal="section"
+          >
             <p className="chapter-label"><span>03</span> Music</p>
-            <h2 id="music-title">Three artists. Three kinds of force.</h2>
+            <h2
+              id="music-title"
+              className="kinetic-heading kinetic-heading--world"
+              data-motion-copy="Three artists. Three kinds of force."
+              data-reveal="heading"
+            >
+              Three artists. Three kinds of force.
+            </h2>
             <p>
               Linkin Park, Hans Zimmer, and Michael Jackson are the artists I return
               to. Not as decoration—as lessons in tension, scale, rhythm, and release.
@@ -179,6 +257,8 @@ export default function HomePage() {
             <article
               className={`world-beat music-beat world-beat--${index % 2 ? "left" : "right"}`}
               key={influence.artist}
+              data-camera-beat={influence.artist.toLowerCase().replaceAll(" ", "-")}
+              data-reveal="section"
             >
               <div className="world-copy music-artist">
                 <div className="music-artist__meta">
@@ -187,13 +267,23 @@ export default function HomePage() {
                   <span>Listening influence</span>
                 </div>
                 <p className="music-artist__number" aria-hidden="true">{influence.index}</p>
-                <h3>{influence.artist}</h3>
+                <h3
+                  className="kinetic-heading kinetic-heading--artist"
+                  data-motion-copy={influence.artist}
+                  data-reveal="heading"
+                >
+                  {influence.artist}
+                </h3>
                 <p>{influence.copy}</p>
               </div>
             </article>
           ))}
 
-          <div className="world-closing world-copy world-copy--left">
+          <div
+            className="world-closing world-copy world-copy--left"
+            data-camera-beat="music-close"
+            data-reveal="section"
+          >
             <p className="closing-line">
               Build. Release. Rhythm. Atmosphere. The same instincts follow me into
               products, systems, images, and motion.
@@ -208,9 +298,20 @@ export default function HomePage() {
           data-world="archive"
           aria-labelledby="image-title"
         >
-          <div className="world-intro world-copy world-copy--right">
+          <div
+            className="world-intro world-copy world-copy--right"
+            data-camera-beat="archive-open"
+            data-reveal="section"
+          >
             <p className="chapter-label"><span>04</span> Image</p>
-            <h2 id="image-title">A different kind of system: the image.</h2>
+            <h2
+              id="image-title"
+              className="kinetic-heading kinetic-heading--world"
+              data-motion-copy="A different kind of system: the image."
+              data-reveal="heading"
+            >
+              A different kind of system: the image.
+            </h2>
             <p>
               A cinematic shell for VFX work and photography. These supplied visual
               studies establish the motion language; final credited shots, roles,
@@ -218,13 +319,23 @@ export default function HomePage() {
             </p>
           </div>
 
-          <article className="world-beat world-beat--left archive-beat">
+          <article
+            className="world-beat world-beat--left archive-beat"
+            data-camera-beat="vfx"
+            data-reveal="section"
+          >
             <div className="world-copy">
               <div className="beat-meta">
                 <span>Projection volume</span>
                 <span>Media forthcoming</span>
               </div>
-              <h3>VFX</h3>
+              <h3
+                className="kinetic-heading kinetic-heading--archive"
+                data-motion-copy="VFX"
+                data-reveal="heading"
+              >
+                VFX
+              </h3>
               <p className="beat-summary">
                 A projection-led space for finished shots, before-and-after
                 breakdowns, and process—presented one sequence at a time.
@@ -233,13 +344,23 @@ export default function HomePage() {
             </div>
           </article>
 
-          <article className="world-beat world-beat--right archive-beat">
+          <article
+            className="world-beat world-beat--right archive-beat"
+            data-camera-beat="photography"
+            data-reveal="section"
+          >
             <div className="world-copy">
               <div className="beat-meta">
                 <span>Contact sequence</span>
                 <span>Series forthcoming</span>
               </div>
-              <h3>Photography</h3>
+              <h3
+                className="kinetic-heading kinetic-heading--archive"
+                data-motion-copy="Photography"
+                data-reveal="heading"
+              >
+                Photography
+              </h3>
               <p className="beat-summary">
                 An editorial sequence for photographs, captions, and context—paced
                 like a contact sheet rather than a tiled gallery.
@@ -248,7 +369,11 @@ export default function HomePage() {
             </div>
           </article>
 
-          <div className="world-closing world-copy world-copy--left">
+          <div
+            className="world-closing world-copy world-copy--left"
+            data-camera-beat="archive-close"
+            data-reveal="section"
+          >
             <p className="closing-line">
               The archive is intentionally honest: no invented client work, credits,
               or project names.
@@ -261,11 +386,20 @@ export default function HomePage() {
           id="signal"
           className="chapter contact-chapter"
           data-world="contact"
+          data-camera-beat="signal"
+          data-motion-section="signal"
           aria-labelledby="contact-title"
         >
           <div className="chapter-frame contact-frame">
             <p className="chapter-label"><span>05</span> Signal open</p>
-            <h2 id="contact-title">Start a conversation.</h2>
+            <h2
+              id="contact-title"
+              className="kinetic-heading kinetic-heading--contact"
+              data-motion-copy="Start a conversation."
+              data-reveal="heading"
+            >
+              Start a conversation.
+            </h2>
             <p>
               For software engineering, machine learning, infrastructure, simulation,
               or creative-technology work, reach me directly.

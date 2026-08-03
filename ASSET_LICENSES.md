@@ -6,8 +6,8 @@ The motion system, masks, typography treatments, and SVG placeholders are origin
 | --- | --- | --- | --- |
 | Cinematic motion system and CSS treatments | Original code in this repository | Project-owned | Approved |
 | Archive placeholder SVGs | Original vectors in this repository | Project-owned | Approved |
-| IBM Plex Sans Variable | Fontsource package | SIL Open Font License 1.1 | Approved |
-| Bodoni Moda Variable | Fontsource package | SIL Open Font License 1.1 | Approved |
+| Anybody Variable | Fontsource package | SIL Open Font License 1.1 | Approved |
+| Newsreader Variable | Fontsource package | SIL Open Font License 1.1 | Approved |
 | `public/media/football/*` (5 images) | Supplied by site owner | Original source / license not documented | Prototype only — clear before public release |
 | `public/media/racing/*` (4 images) | Supplied by site owner | Original source / license not documented; visible team/brand marks | Prototype only — clear before public release |
 | `public/media/music/*` (7 images) | Supplied by site owner | Original source / license not documented; artist likenesses and album/concert imagery | Prototype only — clear before public release |

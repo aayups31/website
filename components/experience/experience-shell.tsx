@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { scrollRuntime, clamp } from "@/lib/scroll-runtime";
+import { scrollRuntime, clamp, smoothstep } from "@/lib/scroll-runtime";
+import {
+  cinematicTimelines,
+  getShotState,
+  getWorldCamera,
+} from "@/lib/cinematic-timelines";
 import {
   type QualityTier,
   type WorldId,
@@ -42,9 +47,22 @@ export function ExperienceShell() {
   const stageRef = useRef<HTMLDivElement>(null);
   const measureFrameRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const lastAnimationTimeRef = useRef(0);
   const lastScrollRef = useRef({ y: 0, time: 0 });
-  const targetRef = useRef({ local: 0.5, velocity: 0 });
-  const smoothedRef = useRef({ local: 0.5, velocity: 0 });
+  const targetRef = useRef({
+    local: 0.5,
+    beat: 0.5,
+    velocity: 0,
+    pointerX: 0,
+    pointerY: 0,
+  });
+  const smoothedRef = useRef({
+    local: 0.5,
+    beat: 0.5,
+    velocity: 0,
+    pointerX: 0,
+    pointerY: 0,
+  });
   const measuredWorldRef = useRef<WorldId>("prologue");
 
   useProceduralAudio(soundEnabled, activeWorld);
@@ -89,11 +107,47 @@ export function ExperienceShell() {
       const stage = stageRef.current;
       if (!stage) return;
       const local = smoothedRef.current.local;
+      const beatTrack = smoothedRef.current.beat;
       const velocity = smoothedRef.current.velocity;
+      const pointerX = motionReduced ? 0 : smoothedRef.current.pointerX;
+      const pointerY = motionReduced ? 0 : smoothedRef.current.pointerY;
+      const world = scrollRuntime.world;
+      const timeline = cinematicTimelines[world];
+      const motionAmplitude = motionReduced ? 0 : quality === "low" ? 0.55 : 1;
       const travel = motionReduced ? 0 : local - 0.5;
       const velocityOffset = motionReduced ? 0 : clamp(velocity * 22, -18, 18);
+      const safeBeatTrack = clamp(beatTrack, 0, timeline.beatCount);
+      const beatIndex = Math.min(
+        timeline.beatCount - 1,
+        Math.floor(Math.max(0, safeBeatTrack - (safeBeatTrack === timeline.beatCount ? 0.0001 : 0))),
+      );
+      const beatProgress = clamp(safeBeatTrack - beatIndex);
+      const camera = getWorldCamera(world, local, motionAmplitude);
 
       stage.style.setProperty("--world-progress", local.toFixed(4));
+      stage.style.setProperty("--section-p", local.toFixed(4));
+      stage.style.setProperty("--beat-track", safeBeatTrack.toFixed(4));
+      stage.style.setProperty("--beat-index", String(beatIndex));
+      stage.style.setProperty("--beat-p", beatProgress.toFixed(4));
+      stage.style.setProperty("--beat-enter", smoothstep(0, 0.18, beatProgress).toFixed(4));
+      stage.style.setProperty(
+        "--beat-exit",
+        (1 - smoothstep(0.78, 1, beatProgress)).toFixed(4),
+      );
+      stage.style.setProperty("--scroll-v", velocity.toFixed(4));
+      stage.style.setProperty("--scroll-speed", Math.abs(velocity).toFixed(4));
+      stage.style.setProperty("--pointer-x", pointerX.toFixed(4));
+      stage.style.setProperty("--pointer-y", pointerY.toFixed(4));
+      stage.style.setProperty("--pointer-camera-x", `${(pointerX * 1.8).toFixed(3)}deg`);
+      stage.style.setProperty("--pointer-camera-y", `${(pointerY * -1.35).toFixed(3)}deg`);
+      stage.style.setProperty("--cam-x", `${camera.x.toFixed(3)}vw`);
+      stage.style.setProperty("--cam-y", `${camera.y.toFixed(3)}vh`);
+      stage.style.setProperty("--cam-scale", camera.scale.toFixed(5));
+      stage.style.setProperty("--cam-rx", `${camera.rotateX.toFixed(3)}deg`);
+      stage.style.setProperty("--cam-ry", `${camera.rotateY.toFixed(3)}deg`);
+      stage.style.setProperty("--cam-rz", `${camera.rotateZ.toFixed(3)}deg`);
+      stage.style.setProperty("--cam-origin-x", `${camera.originX.toFixed(2)}%`);
+      stage.style.setProperty("--cam-origin-y", `${camera.originY.toFixed(2)}%`);
       stage.style.setProperty("--phase-intro", clamp(1 - local * 2.15).toFixed(4));
       stage.style.setProperty("--phase-middle", Math.sin(local * Math.PI).toFixed(4));
       stage.style.setProperty("--phase-outro", clamp((local - 0.48) * 2.05).toFixed(4));
@@ -117,25 +171,92 @@ export function ExperienceShell() {
       stage.style.setProperty("--far-scale", (1.055 + local * 0.035).toFixed(4));
       stage.style.setProperty("--middle-scale", (1.04 + local * 0.055).toFixed(4));
       stage.style.setProperty("--near-scale", (1.025 + local * 0.075).toFixed(4));
+
+      stage.dataset.cameraWorld = world;
+      stage.dataset.cameraBeat = String(beatIndex);
+
+      const shots = stage.querySelectorAll<HTMLElement>(
+        `[data-cinematic-world="${world}"] [data-cinematic-shot]`,
+      );
+      for (const shot of shots) {
+        const shotId = shot.dataset.cinematicShot;
+        if (!shotId) continue;
+        const state = getShotState(
+          world,
+          shotId,
+          safeBeatTrack,
+          motionAmplitude,
+          motionReduced,
+        );
+        if (!state) continue;
+
+        const depth = shot.dataset.depth === "near"
+          ? 1
+          : shot.dataset.depth === "middle"
+            ? 0.68
+            : 0.38;
+        const pointerDepth = motionReduced ? 0 : depth;
+        const velocityTravel = motionReduced
+          ? 0
+          : clamp(velocity * 3.4 * depth, -7, 7);
+
+        shot.style.opacity = state.opacity.toFixed(4);
+        shot.style.setProperty("--shot-opacity", state.opacity.toFixed(4));
+        shot.style.setProperty("--shot-p", state.progress.toFixed(4));
+        shot.style.setProperty("--shot-x", `${state.frame.x.toFixed(3)}vw`);
+        shot.style.setProperty("--shot-y", `${state.frame.y.toFixed(3)}vh`);
+        shot.style.setProperty("--shot-scale", state.frame.scale.toFixed(5));
+        shot.style.setProperty("--shot-rx", `${state.frame.rotateX.toFixed(3)}deg`);
+        shot.style.setProperty("--shot-ry", `${state.frame.rotateY.toFixed(3)}deg`);
+        shot.style.setProperty("--shot-rz", `${state.frame.rotateZ.toFixed(3)}deg`);
+        shot.style.setProperty("--shot-origin-x", `${state.frame.originX.toFixed(2)}%`);
+        shot.style.setProperty("--shot-origin-y", `${state.frame.originY.toFixed(2)}%`);
+        shot.style.setProperty(
+          "--shot-pointer-x",
+          `${(pointerX * 1.8 * pointerDepth).toFixed(3)}vw`,
+        );
+        shot.style.setProperty(
+          "--shot-pointer-y",
+          `${(pointerY * 1.3 * pointerDepth).toFixed(3)}vh`,
+        );
+        shot.style.setProperty("--shot-velocity-x", `${velocityTravel.toFixed(3)}vw`);
+        if (state.opacity > 0.01) shot.dataset.active = "true";
+        else delete shot.dataset.active;
+      }
     };
 
-    const animate = () => {
-      animationFrameRef.current = null;
+    const animate = (time: number) => {
+      const previousTime = lastAnimationTimeRef.current || time - 16.67;
+      const deltaSeconds = clamp((time - previousTime) / 1000, 1 / 240, 0.05);
+      lastAnimationTimeRef.current = time;
       const target = targetRef.current;
       const smoothed = smoothedRef.current;
-      const easing = motionReduced ? 1 : 0.105;
+      const easing = motionReduced ? 1 : 1 - Math.exp(-deltaSeconds * 8.5);
+      const velocityEasing = motionReduced ? 1 : 1 - Math.exp(-deltaSeconds * 11);
+      const pointerEasing = motionReduced ? 1 : 1 - Math.exp(-deltaSeconds * 7.5);
       smoothed.local += (target.local - smoothed.local) * easing;
-      smoothed.velocity += (target.velocity - smoothed.velocity) * (motionReduced ? 1 : 0.16);
-      target.velocity *= motionReduced ? 0 : 0.78;
+      smoothed.beat += (target.beat - smoothed.beat) * easing;
+      smoothed.velocity += (target.velocity - smoothed.velocity) * velocityEasing;
+      smoothed.pointerX += (target.pointerX - smoothed.pointerX) * pointerEasing;
+      smoothed.pointerY += (target.pointerY - smoothed.pointerY) * pointerEasing;
+      target.velocity *= motionReduced ? 0 : Math.exp(-deltaSeconds * 10);
       scrollRuntime.localProgress = smoothed.local;
       scrollRuntime.velocity = smoothed.velocity;
       writeMotionVariables();
 
       const unsettled =
         Math.abs(target.local - smoothed.local) > 0.0004 ||
+        Math.abs(target.beat - smoothed.beat) > 0.0004 ||
         Math.abs(smoothed.velocity) > 0.001 ||
-        Math.abs(target.velocity) > 0.001;
-      if (unsettled) animationFrameRef.current = window.requestAnimationFrame(animate);
+        Math.abs(target.velocity) > 0.001 ||
+        Math.abs(target.pointerX - smoothed.pointerX) > 0.0004 ||
+        Math.abs(target.pointerY - smoothed.pointerY) > 0.0004;
+      if (unsettled) {
+        animationFrameRef.current = window.requestAnimationFrame(animate);
+      } else {
+        animationFrameRef.current = null;
+        lastAnimationTimeRef.current = 0;
+      }
     };
 
     const requestAnimation = () => {
@@ -151,7 +272,7 @@ export function ExperienceShell() {
       const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
       const deltaY = scrollY - lastScrollRef.current.y;
       const deltaTime = lastScrollRef.current.time
-        ? Math.max(16, now - lastScrollRef.current.time)
+        ? Math.max(8, now - lastScrollRef.current.time)
         : 16;
       scrollRuntime.progress = clamp(scrollY / maxScroll);
       targetRef.current.velocity = clamp(deltaY / deltaTime, -3, 3);
@@ -182,10 +303,43 @@ export function ExperienceShell() {
         const nextLocal = clamp(
           (focusLine - rect.top) / Math.max(1, rect.height),
         );
+        const beatElements = Array.from(
+          selected.querySelectorAll<HTMLElement>(
+            ":scope > .world-intro, :scope > .world-beat, :scope > .world-closing",
+          ),
+        );
+        const beats = beatElements.length > 0 ? beatElements : [selected];
+        let selectedBeat = beats[0];
+        let selectedBeatIndex = 0;
+        let nearestBeatDistance = Number.POSITIVE_INFINITY;
+        for (const [index, beat] of beats.entries()) {
+          const beatRect = beat.getBoundingClientRect();
+          const containsFocus = beatRect.top <= focusLine && beatRect.bottom >= focusLine;
+          const distance = containsFocus
+            ? 0
+            : Math.min(
+                Math.abs(beatRect.top - focusLine),
+                Math.abs(beatRect.bottom - focusLine),
+              );
+          if (distance < nearestBeatDistance) {
+            selectedBeat = beat;
+            selectedBeatIndex = index;
+            nearestBeatDistance = distance;
+          }
+        }
+        const selectedBeatRect = selectedBeat.getBoundingClientRect();
+        const selectedBeatProgress = clamp(
+          (focusLine - selectedBeatRect.top) / Math.max(1, selectedBeatRect.height),
+        );
+        const configuredBeatCount = cinematicTimelines[world].beatCount;
+        const nextBeatTrack =
+          ((selectedBeatIndex + selectedBeatProgress) / beats.length) * configuredBeatCount;
         targetRef.current.local = nextLocal;
+        targetRef.current.beat = nextBeatTrack;
         if (world !== measuredWorldRef.current) {
           measuredWorldRef.current = world;
           smoothedRef.current.local = nextLocal;
+          smoothedRef.current.beat = nextBeatTrack;
         }
         if (worldOrder.includes(world) && world !== useExperienceStore.getState().activeWorld) {
           setActiveWorld(world);
@@ -200,12 +354,37 @@ export function ExperienceShell() {
       }
     };
 
+    const onPointerMove = (event: PointerEvent) => {
+      if (motionReduced || event.pointerType === "touch") return;
+      targetRef.current.pointerX = clamp(
+        (event.clientX / Math.max(1, window.innerWidth)) * 2 - 1,
+        -1,
+        1,
+      );
+      targetRef.current.pointerY = clamp(
+        (event.clientY / Math.max(1, window.innerHeight)) * 2 - 1,
+        -1,
+        1,
+      );
+      requestAnimation();
+    };
+
+    const onPointerLeave = () => {
+      targetRef.current.pointerX = 0;
+      targetRef.current.pointerY = 0;
+      requestAnimation();
+    };
+
     measure();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.documentElement.addEventListener("pointerleave", onPointerLeave);
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      window.removeEventListener("pointermove", onPointerMove);
+      document.documentElement.removeEventListener("pointerleave", onPointerLeave);
       if (measureFrameRef.current !== null) {
         window.cancelAnimationFrame(measureFrameRef.current);
         measureFrameRef.current = null;
@@ -214,8 +393,9 @@ export function ExperienceShell() {
         window.cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
+      lastAnimationTimeRef.current = 0;
     };
-  }, [motionReduced, setActiveWorld]);
+  }, [motionReduced, quality, setActiveWorld]);
 
   useEffect(() => {
     document.documentElement.dataset.world = activeWorld;

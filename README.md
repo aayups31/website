@@ -1,6 +1,6 @@
 # Aayu Pratap Singh — cinematic portfolio
 
-A content-first personal portfolio progressively enhanced with scroll-directed, image-led cinematic worlds.
+A content-first personal portfolio with scroll-scrubbed camera choreography, image-led cinematic worlds, and kinetic variable typography.
 
 ## Run locally
 
@@ -31,8 +31,10 @@ canonical URLs, the sitemap, and the robots file point at the live domain.
 
 - Semantic content never depends on the decorative motion layer.
 - Sound is opt-in and reduced motion is respected.
-- Full-screen 2.5D compositions use supplied stills, soft masks, parallax, and editorial type instead of modelled placeholder rooms.
+- Full-screen 2.5D compositions use supplied stills as independently choreographed shots: dolly, pan, tilt, roll, focal shift, pointer depth, and short zoom-through cuts.
 - Only the active chapter and its neighboring image worlds are mounted at once.
+- Supporting routes share a lighter fixed camera atmosphere plus scroll, reveal, magnetic, and variable-type motion hooks.
+- Anybody Variable and Newsreader Variable are self-hosted; no third-party font request is made at runtime.
 - Supplied reference images are tracked in the rights ledger and remain provisional until publication rights are confirmed.
 - VFX and photography areas are structured so final credited work can replace the current studies without redesigning the world.
 

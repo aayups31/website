@@ -9,6 +9,7 @@ import {
 } from "@/lib/experience-store";
 
 type ImageLayer = {
+  shot: string;
   src: string;
   className: string;
   position?: string;
@@ -29,20 +30,22 @@ const compositions: WorldComposition[] = [
     watermark: "BEHIND THE MOMENT",
     layers: [
       {
+        shot: "prologue-aerial",
         src: "/media/football/stadium-aerial.webp",
         className: "cinematic-layer--base image--stadium-aerial",
         position: "50% 52%",
       },
       {
+        shot: "prologue-bowl",
         src: "/media/football/stadium-bowl.webp",
-        className:
-          "cinematic-layer--far cinematic-layer--phase-middle image--stadium-bowl",
+        className: "cinematic-layer--far image--stadium-bowl",
         position: "50% 58%",
       },
       {
+        shot: "prologue-locker",
         src: "/media/football/locker-room.jpg",
         className:
-          "cinematic-layer--near cinematic-layer--phase-outro cinematic-layer--optional image--locker-threshold",
+          "cinematic-layer--near cinematic-layer--optional image--locker-threshold",
         position: "50% 50%",
         sizes: "(max-width: 760px) 78vw, 48vw",
       },
@@ -54,27 +57,29 @@ const compositions: WorldComposition[] = [
     watermark: "BUILT BACKSTAGE",
     layers: [
       {
+        shot: "football-night",
         src: "/media/football/match-night.webp",
         className: "cinematic-layer--base image--match-night",
         position: "52% 48%",
       },
       {
+        shot: "football-bowl",
         src: "/media/football/stadium-bowl.webp",
-        className:
-          "cinematic-layer--far cinematic-layer--phase-intro image--football-bowl",
+        className: "cinematic-layer--far image--football-bowl",
         position: "50% 58%",
       },
       {
+        shot: "football-locker",
         src: "/media/football/locker-room.jpg",
-        className:
-          "cinematic-layer--middle cinematic-layer--phase-middle image--football-locker",
+        className: "cinematic-layer--middle image--football-locker",
         position: "50% 50%",
         sizes: "(max-width: 760px) 92vw, 62vw",
       },
       {
+        shot: "football-pitch",
         src: "/media/football/pitch-line.jpeg",
         className:
-          "cinematic-layer--near cinematic-layer--phase-outro cinematic-layer--optional image--football-pitch",
+          "cinematic-layer--near cinematic-layer--optional image--football-pitch",
         position: "50% 50%",
         sizes: "(max-width: 760px) 72vw, 38vw",
       },
@@ -86,27 +91,28 @@ const compositions: WorldComposition[] = [
     watermark: "EVERY SIGNAL",
     layers: [
       {
+        shot: "racing-studio",
         src: "/media/racing/studio-car.avif",
         className: "cinematic-layer--base image--racing-studio",
         position: "50% 56%",
       },
       {
+        shot: "racing-garage",
         src: "/media/racing/garage.jpeg",
-        className:
-          "cinematic-layer--middle cinematic-layer--phase-intro image--racing-garage",
+        className: "cinematic-layer--middle image--racing-garage",
         position: "50% 50%",
         sizes: "(max-width: 760px) 94vw, 58vw",
       },
       {
+        shot: "racing-corner",
         src: "/media/racing/ferrari-corner.jpg",
-        className:
-          "cinematic-layer--far cinematic-layer--phase-middle image--racing-corner",
+        className: "cinematic-layer--far image--racing-corner",
         position: "70% 52%",
       },
       {
+        shot: "racing-track",
         src: "/media/racing/car-on-track.jpg",
-        className:
-          "cinematic-layer--near cinematic-layer--phase-outro image--racing-track",
+        className: "cinematic-layer--near image--racing-track",
         position: "62% 50%",
       },
     ],
@@ -117,47 +123,51 @@ const compositions: WorldComposition[] = [
     watermark: "LISTEN CLOSELY",
     layers: [
       {
+        shot: "music-arena",
         src: "/media/music/zimmer-arena.jpg",
         className: "cinematic-layer--base image--music-arena",
         position: "50% 52%",
       },
       {
+        shot: "music-linkin-art",
         src: "/media/music/linkin-park-hybrid.jpg",
-        className:
-          "cinematic-layer--far cinematic-layer--phase-intro cinematic-layer--music-linkin image--music-linkin",
+        className: "cinematic-layer--far image--music-linkin",
         position: "50% 50%",
       },
       {
+        shot: "music-linkin-band",
         src: "/media/music/linkin-park-band.jpeg",
         className:
-          "cinematic-layer--near cinematic-layer--phase-intro cinematic-layer--music-linkin cinematic-layer--optional image--music-band",
+          "cinematic-layer--near cinematic-layer--optional image--music-band",
         position: "50% 50%",
         sizes: "(max-width: 760px) 88vw, 54vw",
       },
       {
+        shot: "music-orchestra",
         src: "/media/music/zimmer-orchestra.webp",
-        className:
-          "cinematic-layer--middle cinematic-layer--phase-middle cinematic-layer--music-zimmer image--music-orchestra",
+        className: "cinematic-layer--middle image--music-orchestra",
         position: "50% 48%",
       },
       {
+        shot: "music-stars",
         src: "/media/music/zimmer-stars.jpg",
         className:
-          "cinematic-layer--near cinematic-layer--phase-middle cinematic-layer--music-zimmer cinematic-layer--optional image--music-stars",
+          "cinematic-layer--near cinematic-layer--optional image--music-stars",
         position: "50% 50%",
         sizes: "(max-width: 760px) 76vw, 42vw",
       },
       {
+        shot: "music-michael-stage",
         src: "/media/music/michael-jackson-stage.jpg",
-        className:
-          "cinematic-layer--near cinematic-layer--phase-outro cinematic-layer--music-michael image--music-michael",
+        className: "cinematic-layer--near image--music-michael",
         position: "50% 32%",
         sizes: "(max-width: 760px) 74vw, 34vw",
       },
       {
+        shot: "music-michael-glove",
         src: "/media/music/michael-jackson-glove.jpeg",
         className:
-          "cinematic-layer--middle cinematic-layer--phase-outro cinematic-layer--music-michael cinematic-layer--optional image--music-glove",
+          "cinematic-layer--middle cinematic-layer--optional image--music-glove",
         position: "50% 38%",
         sizes: "24vw",
       },
@@ -169,21 +179,22 @@ const compositions: WorldComposition[] = [
     watermark: "IMAGE / MOTION",
     layers: [
       {
+        shot: "archive-drift",
         src: "/media/archive/drifting.jpg",
         className: "cinematic-layer--base image--archive-drift",
         position: "52% 50%",
       },
       {
+        shot: "archive-parked",
         src: "/media/archive/parked.jpg",
-        className:
-          "cinematic-layer--middle cinematic-layer--phase-intro image--archive-parked",
+        className: "cinematic-layer--middle image--archive-parked",
         position: "50% 55%",
         sizes: "(max-width: 760px) 78vw, 38vw",
       },
       {
+        shot: "archive-engine",
         src: "/media/archive/skyline-engine.jpg",
-        className:
-          "cinematic-layer--near cinematic-layer--phase-middle image--archive-engine",
+        className: "cinematic-layer--near image--archive-engine",
         position: "50% 48%",
         sizes: "(max-width: 760px) 76vw, 34vw",
       },
@@ -195,14 +206,15 @@ const compositions: WorldComposition[] = [
     watermark: "MAKE CONTACT",
     layers: [
       {
+        shot: "contact-stars",
         src: "/media/music/zimmer-stars.jpg",
         className: "cinematic-layer--base image--contact-stars",
         position: "50% 45%",
       },
       {
+        shot: "contact-aerial",
         src: "/media/football/stadium-aerial.webp",
-        className:
-          "cinematic-layer--far cinematic-layer--phase-outro image--contact-aerial",
+        className: "cinematic-layer--far image--contact-aerial",
         position: "50% 50%",
       },
     ],
@@ -248,20 +260,37 @@ export function CinematicWorlds() {
             data-cinematic-world={world.id}
             key={world.id}
           >
-            {layers.map((layer, index) => (
-              <div className={`cinematic-layer ${layer.className}`} key={layer.src}>
-                <Image
-                  src={layer.src}
-                  alt=""
-                  fill
-                  sizes={layer.sizes ?? "100vw"}
-                  priority={world.id === "prologue" && index === 0}
-                  onLoad={world.id === "prologue" && index === 0 ? markReady : undefined}
-                  onError={world.id === "prologue" && index === 0 ? markReady : undefined}
-                  style={{ objectPosition: layer.position }}
-                />
-              </div>
-            ))}
+            {layers.map((layer, index) => {
+              const depth = layer.className.includes("cinematic-layer--near")
+                ? "near"
+                : layer.className.includes("cinematic-layer--middle")
+                  ? "middle"
+                  : "far";
+
+              return (
+                <div
+                  className={`cinematic-shot cinematic-shot--${layer.shot}`}
+                  data-cinematic-shot={layer.shot}
+                  data-depth={depth}
+                  key={layer.shot}
+                >
+                  <div className="cinematic-shot__camera" data-camera-rig>
+                    <div className={`cinematic-layer cinematic-shot__image ${layer.className}`}>
+                      <Image
+                        src={layer.src}
+                        alt=""
+                        fill
+                        sizes={layer.sizes ?? "100vw"}
+                        priority={world.id === "prologue" && index === 0}
+                        onLoad={world.id === "prologue" && index === 0 ? markReady : undefined}
+                        onError={world.id === "prologue" && index === 0 ? markReady : undefined}
+                        style={{ objectPosition: layer.position }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
             <div className="cinematic-world__light" />
             <div className="cinematic-world__aperture" />
             <p className="cinematic-world__label">{world.label}</p>

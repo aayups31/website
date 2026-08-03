@@ -83,42 +83,56 @@ export function SiteHeader({ immersive = false }: { immersive?: boolean }) {
 
   return (
     <header className="site-header" data-immersive={immersive || undefined}>
-      <Link className="wordmark" href="/" aria-label="Aayu Pratap Singh — home">
+      <Link
+        className="wordmark"
+        href="/"
+        aria-label="Aayu Pratap Singh — home"
+        data-magnetic="wordmark"
+        data-magnetic-strength="5"
+      >
         <span className="wordmark__monogram">APS</span>
         <span className="wordmark__name">Aayu Pratap Singh</span>
       </Link>
 
       <nav className="desktop-nav" aria-label="Primary navigation">
         {navigation.map((item) => (
-          <Link key={item.href} href={item.href}>
+          <Link
+            key={item.href}
+            href={item.href}
+            data-magnetic="nav"
+            data-magnetic-strength="5"
+          >
             {item.label}
           </Link>
         ))}
-        <Link className="nav-contact" href="/contact">
+        <Link
+          className="nav-contact"
+          href="/contact"
+          data-magnetic="nav"
+          data-magnetic-strength="5"
+        >
           Contact
         </Link>
       </nav>
 
       <div className="header-controls">
+        <button
+          className="utility-button"
+          type="button"
+          aria-pressed={motionReduced}
+          onClick={toggleMotion}
+        >
+          Motion {motionReduced ? "reduced" : "full"}
+        </button>
         {immersive ? (
-          <>
-            <button
-              className="utility-button"
-              type="button"
-              aria-pressed={motionReduced}
-              onClick={toggleMotion}
-            >
-              Motion {motionReduced ? "reduced" : "full"}
-            </button>
-            <button
-              className="utility-button"
-              type="button"
-              aria-pressed={soundEnabled}
-              onClick={() => setSoundEnabled(!soundEnabled)}
-            >
-              Sound {soundEnabled ? "on" : "off"}
-            </button>
-          </>
+          <button
+            className="utility-button"
+            type="button"
+            aria-pressed={soundEnabled}
+            onClick={() => setSoundEnabled(!soundEnabled)}
+          >
+            Sound {soundEnabled ? "on" : "off"}
+          </button>
         ) : null}
         <button
           ref={menuButtonRef}
@@ -156,16 +170,16 @@ export function SiteHeader({ immersive = false }: { immersive?: boolean }) {
             <span>06</span>
             Contact
           </Link>
-          {immersive ? (
-            <div className="mobile-menu__controls" aria-label="Experience settings">
-              <button
-                className="mobile-utility"
-                type="button"
-                aria-pressed={motionReduced}
-                onClick={toggleMotion}
-              >
-                Motion {motionReduced ? "reduced" : "full"}
-              </button>
+          <div className="mobile-menu__controls" aria-label="Display settings">
+            <button
+              className="mobile-utility"
+              type="button"
+              aria-pressed={motionReduced}
+              onClick={toggleMotion}
+            >
+              Motion {motionReduced ? "reduced" : "full"}
+            </button>
+            {immersive ? (
               <button
                 className="mobile-utility"
                 type="button"
@@ -174,8 +188,8 @@ export function SiteHeader({ immersive = false }: { immersive?: boolean }) {
               >
                 Sound {soundEnabled ? "on" : "off"}
               </button>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       </nav>
     </header>

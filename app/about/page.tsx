@@ -14,7 +14,7 @@ export default function AboutPage() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content" className="page-shell">
+      <main id="main-content" className="page-shell" data-motion-route="about">
         <PageIntro
           index="03"
           eyebrow="About"
@@ -22,9 +22,13 @@ export default function AboutPage() {
           description="I study Computer Science at the University of Waterloo and work across product engineering, machine learning, infrastructure, simulation, and visual storytelling."
         />
 
-        <section className="about-statement content-section">
-          <p className="kicker">Perspective</p>
-          <p>
+        <section
+          className="about-statement content-section motion-section"
+          data-motion-section="about-statement"
+          data-reveal="section"
+        >
+          <p className="kicker" data-reveal="meta">Perspective</p>
+          <p data-motion-copy="statement" data-reveal="copy" data-parallax="-0.035">
             I’m drawn to systems in motion: a football match shaped before kickoff,
             a race changing lap by lap, a network carrying pressure, and an image
             deciding how a scene feels. Different subjects, but the same curiosity—
@@ -32,19 +36,39 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section className="values-editorial content-section content-section--quiet">
-          {values.map((value) => (
-            <article key={value.index}>
+        <section
+          className="values-editorial content-section content-section--quiet motion-section"
+          data-motion-section="values"
+        >
+          {values.map((value, index) => (
+            <article key={value.index} data-reveal="article" data-reveal-index={index}>
               <span>{value.index}</span>
-              <h2>{value.title}</h2>
-              <p>{value.copy}</p>
+              <h2
+                className="kinetic-heading kinetic-heading--section"
+                data-motion-copy="heading"
+                data-magnetic="heading"
+              >
+                {value.title}
+              </h2>
+              <p data-reveal="copy">{value.copy}</p>
             </article>
           ))}
         </section>
 
-        <section className="about-outro content-section">
-          <p className="kicker">Next</p>
-          <h2>Interested in work across software, ML, product, systems, and creative technology.</h2>
+        <section
+          className="about-outro content-section motion-section"
+          data-motion-section="about-outro"
+          data-reveal="section"
+        >
+          <p className="kicker" data-reveal="meta">Next</p>
+          <h2
+            className="kinetic-heading kinetic-heading--statement"
+            data-motion-copy="heading"
+            data-reveal="heading"
+            data-parallax="-0.045"
+          >
+            Interested in work across software, ML, product, systems, and creative technology.
+          </h2>
           <ArrowLink href="/contact">Start a conversation</ArrowLink>
         </section>
       </main>

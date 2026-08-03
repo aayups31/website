@@ -22,7 +22,11 @@ export default function ResumePage() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content" className="page-shell resume-page">
+      <main
+        id="main-content"
+        className="page-shell resume-page"
+        data-motion-route="resume"
+      >
         <PageIntro
           index="05"
           eyebrow="Résumé"
@@ -30,27 +34,60 @@ export default function ResumePage() {
           description="A privacy-conscious HTML résumé covering product engineering, machine learning, network infrastructure, and simulation."
         />
 
-        <section className="resume-contact content-section">
-          <p>{siteConfig.location}</p>
-          <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
-          <a href={siteConfig.github} target="_blank" rel="noreferrer">github.com/aayups31</a>
-          <p className="resume-privacy">The public résumé intentionally omits a phone number.</p>
+        <section
+          className="resume-contact content-section motion-section"
+          data-motion-section="resume-contact"
+          data-reveal="section"
+        >
+          <p data-reveal="meta">{siteConfig.location}</p>
+          <a href={`mailto:${siteConfig.email}`} data-magnetic="link" data-motion-copy="link">
+            {siteConfig.email}
+          </a>
+          <a
+            href={siteConfig.github}
+            target="_blank"
+            rel="noreferrer"
+            data-magnetic="link"
+            data-motion-copy="link"
+          >
+            github.com/aayups31
+          </a>
+          <p className="resume-privacy" data-reveal="copy">
+            The public résumé intentionally omits a phone number.
+          </p>
         </section>
 
-        <section className="resume-section content-section">
-          <p className="kicker">Education</p>
-          <div className="resume-row">
-            <h2>University of Waterloo</h2>
+        <section
+          className="resume-section content-section motion-section"
+          data-motion-section="resume-education"
+          data-reveal="section"
+        >
+          <p className="kicker" data-reveal="meta">Education</p>
+          <div className="resume-row" data-reveal="row">
+            <h2
+              className="kinetic-heading kinetic-heading--row"
+              data-motion-copy="heading"
+            >
+              University of Waterloo
+            </h2>
             <p>Bachelor of Computer Science, Honours, Co-op</p>
             <p>Sep 2024 — Apr 2029 (expected)</p>
           </div>
         </section>
 
-        <section className="resume-section content-section content-section--quiet">
-          <p className="kicker">Experience</p>
-          {experience.map((item) => (
-            <div className="resume-row" key={item.id}>
-              <h2>{item.organisation}</h2>
+        <section
+          className="resume-section content-section content-section--quiet motion-section"
+          data-motion-section="resume-experience"
+        >
+          <p className="kicker" data-reveal="meta">Experience</p>
+          {experience.map((item, index) => (
+            <div className="resume-row" key={item.id} data-reveal="row" data-reveal-index={index}>
+              <h2
+                className="kinetic-heading kinetic-heading--row"
+                data-motion-copy="heading"
+              >
+                {item.organisation}
+              </h2>
               <p>{item.role}</p>
               <p>{item.period}</p>
               <ul>{item.evidence.map((line) => <li key={line}>{line}</li>)}</ul>
@@ -58,22 +95,44 @@ export default function ResumePage() {
           ))}
         </section>
 
-        <section className="resume-section content-section">
-          <p className="kicker">Selected projects</p>
-          {projects.filter((project) => project.slug !== "unimarket").map((project) => (
-            <div className="resume-row" key={project.slug}>
-              <h2>{project.title}</h2>
+        <section
+          className="resume-section content-section motion-section"
+          data-motion-section="resume-projects"
+        >
+          <p className="kicker" data-reveal="meta">Selected projects</p>
+          {projects.filter((project) => project.slug !== "unimarket").map((project, index) => (
+            <div
+              className="resume-row"
+              key={project.slug}
+              data-project-item={project.slug}
+              data-reveal="row"
+              data-reveal-index={index}
+            >
+              <h2
+                className="kinetic-heading kinetic-heading--row"
+                data-motion-copy="project-title"
+              >
+                {project.title}
+              </h2>
               <p>{project.period}</p>
               <p>{project.summary}</p>
             </div>
           ))}
         </section>
 
-        <section className="resume-section content-section content-section--quiet">
-          <p className="kicker">Technical range</p>
-          {skillGroups.map(([label, skills]) => (
-            <div className="skills-row" key={label}>
-              <h2>{label}</h2>
+        <section
+          className="resume-section content-section content-section--quiet motion-section"
+          data-motion-section="resume-skills"
+        >
+          <p className="kicker" data-reveal="meta">Technical range</p>
+          {skillGroups.map(([label, skills], index) => (
+            <div className="skills-row" key={label} data-reveal="row" data-reveal-index={index}>
+              <h2
+                className="kinetic-heading kinetic-heading--row"
+                data-motion-copy="heading"
+              >
+                {label}
+              </h2>
               <p>{skills}</p>
             </div>
           ))}
