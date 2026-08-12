@@ -1,6 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource-variable/anybody/wdth.css";
-import "@fontsource-variable/anybody/wdth-italic.css";
 import "@fontsource-variable/newsreader/opsz.css";
 import "@fontsource-variable/newsreader/opsz-italic.css";
 import "./globals.css";
@@ -9,7 +7,7 @@ import { GlobalMotionController } from "@/components/motion/global-motion-contro
 import { RouteAtmosphere } from "@/components/motion/route-atmosphere";
 
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://aayups31.github.io/website";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

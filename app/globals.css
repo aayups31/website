@@ -9,8 +9,8 @@
   --blue-pale: #b7cdfc;
   --amber: #d49a5a;
   --acid: #b6bc98;
-  --display: "Anybody Variable", "Arial Narrow", sans-serif;
-  --sans: "Anybody Variable", "Helvetica Neue", sans-serif;
+  --display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --editorial: "Newsreader Variable", Georgia, serif;
   --meta: ui-monospace, "SFMono-Regular", "Cascadia Mono", monospace;
   --type-ink: #f1ede3;
@@ -69,6 +69,10 @@ body::before {
   opacity: 0.07;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
   mix-blend-mode: soft-light;
+}
+
+body:has([data-automotive-home])::before {
+  display: none;
 }
 
 ::selection {
@@ -157,6 +161,17 @@ p {
   background: linear-gradient(to bottom, rgba(5, 6, 7, 0.76), rgba(5, 6, 7, 0));
   border-bottom-color: transparent;
   backdrop-filter: none;
+}
+
+body:has([data-automotive-home]) .site-header {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+body:has([data-automotive-home]) .site-header .wordmark__monogram,
+body:has([data-automotive-home]) .site-header .desktop-nav a,
+body:has([data-automotive-home]) .site-header .utility-button {
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", monospace;
+  font-variation-settings: normal;
 }
 
 .wordmark {
@@ -383,7 +398,6 @@ p {
 
 .arrow-link:hover,
 .arrow-link:focus-visible {
-  padding-right: 0.35rem;
   border-color: var(--paper);
 }
 
@@ -2609,7 +2623,7 @@ html[data-quality="low"] .cinematic-grain {
 }
 
 body {
-  font-variation-settings: "wdth" 96, "wght" 390;
+  font-variation-settings: normal;
 }
 
 body:has(.route-atmosphere--experience),
@@ -2836,14 +2850,14 @@ body:has(.route-atmosphere--case-product) {
   will-change: transform;
 }
 
-[data-magnetic] {
+[data-magnetic]:not(a):not(.kinetic-heading) {
   --magnetic-x: 0px;
   --magnetic-y: 0px;
   transform: translate3d(var(--magnetic-x), var(--magnetic-y), 0);
   transition: transform 520ms var(--ease-out);
 }
 
-[data-parallax][data-magnetic] {
+[data-parallax][data-magnetic]:not(a):not(.kinetic-heading) {
   transform: translate3d(
     var(--magnetic-x),
     calc(var(--magnetic-y) + var(--parallax-y, 0px)),
@@ -2851,67 +2865,29 @@ body:has(.route-atmosphere--case-product) {
   );
 }
 
-[data-magnetic][data-motion-active="true"] {
+[data-magnetic][data-motion-active="true"]:not(a):not(.kinetic-heading) {
   transition-duration: 120ms;
 }
 
-/* Variable-width, scroll-filled display system */
+/* Clean editorial display system. Motion comes from section choreography, not hover distortion. */
 .kinetic-heading {
-  --type-progress: 0.52;
   position: relative;
   color: var(--type-ink);
   font-family: var(--display);
-  font-variation-settings:
-    "wdth" calc(68 + var(--type-progress, 0.52) * 34),
-    "wght" calc(275 + var(--type-progress, 0.52) * 165);
-  font-optical-sizing: auto;
+  font-variation-settings: normal;
   text-wrap: balance;
-  transition:
-    font-variation-settings 700ms var(--ease-out),
-    letter-spacing 700ms var(--ease-out),
-    filter 500ms ease;
-}
-
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-  .kinetic-heading {
-    background:
-      linear-gradient(
-        106deg,
-        #f4f0e6 7%,
-        var(--route-accent) 36%,
-        #f4f0e6 55%,
-        #aab4c8 74%,
-        var(--route-accent) 96%
-      );
-    background-position: var(--texture-position, 28%) 50%;
-    background-size: 230% 100%;
-    color: transparent;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 1.4rem var(--route-accent-soft));
-  }
+  transition: color 300ms ease;
 }
 
 .page-intro h1.kinetic-heading,
 .case-hero h1.kinetic-heading,
 .contact-page__hero h1.kinetic-heading {
-  font-variation-settings:
-    "wdth" calc(61 + var(--type-progress, 0.52) * 45),
-    "wght" calc(245 + var(--type-progress, 0.52) * 185);
+  font-variation-settings: normal;
 }
 
 .kinetic-heading__line {
   display: block;
   transform-origin: left center;
-}
-
-.kinetic-heading:hover,
-.kinetic-heading[data-motion-active="true"],
-a:focus-visible .kinetic-heading {
-  font-variation-settings: "wdth" 112, "wght" 520;
-  letter-spacing: -0.035em;
-  filter: drop-shadow(0 0 2.2rem var(--route-accent-soft));
 }
 
 .hero-title__serif,
@@ -3004,18 +2980,11 @@ a:focus-visible .kinetic-heading {
 .arrow-link__label-current,
 .arrow-link__label-next {
   display: block;
-  transition:
-    transform 620ms var(--ease-out),
-    color 420ms ease,
-    font-variation-settings 620ms var(--ease-out);
+  transition: color 300ms ease;
 }
 
 .arrow-link__label-next {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  color: var(--route-accent);
-  font-variation-settings: "wdth" 118, "wght" 540;
+  display: none;
 }
 
 .arrow-link__arrow {
@@ -3029,12 +2998,7 @@ a:focus-visible .kinetic-heading {
 
 .arrow-link:hover .arrow-link__label-current,
 .arrow-link:focus-visible .arrow-link__label-current {
-  transform: translateY(-112%);
-}
-
-.arrow-link:hover .arrow-link__label-next,
-.arrow-link:focus-visible .arrow-link__label-next {
-  transform: translateY(-100%);
+  color: var(--route-accent);
 }
 
 .arrow-link:hover .arrow-link__arrow,
@@ -3069,18 +3033,13 @@ a:focus-visible .kinetic-heading {
 }
 
 .project-index__title strong {
-  font-variation-settings: "wdth" 76, "wght" 330;
-  transition:
-    color 450ms ease,
-    font-variation-settings 700ms var(--ease-out),
-    transform 700ms var(--ease-out);
+  font-variation-settings: normal;
+  transition: color 300ms ease;
 }
 
 .project-index a:hover .project-index__title strong,
 .project-index a:focus-visible .project-index__title strong {
   color: var(--route-accent);
-  font-variation-settings: "wdth" 116, "wght" 510;
-  transform: translateX(clamp(0.4rem, 1vw, 1.2rem));
 }
 
 .project-index:has(a:hover) li:not(:has(a:hover)),
@@ -3357,8 +3316,7 @@ html[data-motion="reduced"] .motion-ready [data-reveal] {
 }
 
 html[data-motion="reduced"] .kinetic-heading {
-  background-position: 48% 50%;
-  font-variation-settings: "wdth" 92, "wght" 390;
+  font-variation-settings: normal;
   filter: none;
 }
 

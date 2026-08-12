@@ -12,7 +12,13 @@ const navigation = [
   { label: "Résumé", href: "/resume" },
 ];
 
-export function SiteHeader({ immersive = false }: { immersive?: boolean }) {
+export function SiteHeader({
+  immersive = false,
+  soundControl = immersive,
+}: {
+  immersive?: boolean;
+  soundControl?: boolean;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const mobileMenuRef = useRef<HTMLElement>(null);
@@ -124,7 +130,7 @@ export function SiteHeader({ immersive = false }: { immersive?: boolean }) {
         >
           Motion {motionReduced ? "reduced" : "full"}
         </button>
-        {immersive ? (
+        {soundControl ? (
           <button
             className="utility-button"
             type="button"
@@ -153,6 +159,7 @@ export function SiteHeader({ immersive = false }: { immersive?: boolean }) {
         className="mobile-menu"
         aria-label="Mobile navigation"
         aria-hidden={!menuOpen}
+        inert={!menuOpen || undefined}
       >
         <div className="mobile-menu__inner">
           <p className="kicker">Navigate</p>
@@ -179,7 +186,7 @@ export function SiteHeader({ immersive = false }: { immersive?: boolean }) {
             >
               Motion {motionReduced ? "reduced" : "full"}
             </button>
-            {immersive ? (
+            {soundControl ? (
               <button
                 className="mobile-utility"
                 type="button"

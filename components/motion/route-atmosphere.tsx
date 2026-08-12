@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 type AtmosphereLayer = {
@@ -18,82 +17,82 @@ type AtmosphereConfig = {
 const routeAtmospheres: Record<string, AtmosphereConfig> = {
   experience: {
     id: "experience",
-    tone: "stadium-blue",
+    tone: "senna-orange",
     layers: [
-      { src: "/media/football/stadium-bowl.webp", position: "50% 54%", depth: "far" },
-      { src: "/media/football/locker-room.jpg", position: "50% 48%", depth: "near" },
+      { src: "/vehicles/optimized/senna/senna-hero-closed-v1-desktop.webp", position: "58% 56%", depth: "far" },
+      { src: "/vehicles/optimized/senna/senna-body-macro-v1-desktop.webp", position: "48% 50%", depth: "near" },
     ],
   },
   projects: {
     id: "projects",
     tone: "race-amber",
     layers: [
-      { src: "/media/racing/studio-car.avif", position: "52% 58%", depth: "far" },
-      { src: "/media/racing/car-on-track.jpg", position: "64% 50%", depth: "middle" },
+      { src: "/vehicles/optimized/f1/f1-hero-v1-desktop.webp", position: "56% 56%", depth: "far" },
+      { src: "/vehicles/optimized/f1/f1-cockpit-v1-desktop.webp", position: "50% 48%", depth: "middle" },
     ],
   },
   "case-f1": {
     id: "case-f1",
     tone: "race-red",
     layers: [
-      { src: "/media/racing/ferrari-corner.jpg", position: "68% 52%", depth: "far" },
-      { src: "/media/racing/car-on-track.jpg", position: "62% 50%", depth: "near" },
+      { src: "/vehicles/optimized/f1/f1-cockpit-v1-desktop.webp", position: "52% 50%", depth: "far" },
+      { src: "/vehicles/optimized/f1/f1-hero-v1-desktop.webp", position: "62% 55%", depth: "near" },
     ],
   },
   "case-sports": {
     id: "case-sports",
-    tone: "pitch-blue",
+    tone: "technical-blue",
     layers: [
-      { src: "/media/football/match-night.webp", position: "50% 48%", depth: "far" },
-      { src: "/media/football/pitch-line.jpeg", position: "50% 52%", depth: "near" },
+      { src: "/vehicles/optimized/skyline/skyline-hero-closed-v1-desktop.webp", position: "55% 56%", depth: "far" },
+      { src: "/vehicles/optimized/skyline/skyline-hero-xray-v1-desktop.webp", position: "56% 52%", depth: "near" },
     ],
   },
   "case-music": {
     id: "case-music",
-    tone: "concert-gold",
+    tone: "aperture-amber",
     layers: [
-      { src: "/media/music/zimmer-arena.jpg", position: "50% 52%", depth: "far" },
-      { src: "/media/music/zimmer-stars.jpg", position: "50% 48%", depth: "near" },
+      { src: "/vehicles/optimized/senna/senna-exhaust-macro-v1-desktop.webp", position: "50% 50%", depth: "far" },
+      { src: "/vehicles/optimized/senna/senna-wheel-macro-v1-desktop.webp", position: "67% 54%", depth: "near" },
     ],
   },
   "case-product": {
     id: "case-product",
     tone: "signal-cyan",
     layers: [
-      { src: "/media/archive/skyline-engine.jpg", position: "50% 46%", depth: "far" },
-      { src: "/media/racing/garage.jpeg", position: "50% 50%", depth: "middle" },
+      { src: "/vehicles/optimized/skyline/skyline-hero-xray-v1-desktop.webp", position: "56% 52%", depth: "far" },
+      { src: "/vehicles/optimized/senna/senna-body-macro-v1-desktop.webp", position: "48% 50%", depth: "middle" },
     ],
   },
   about: {
     id: "about",
-    tone: "memory-indigo",
+    tone: "skyline-blue",
     layers: [
-      { src: "/media/football/stadium-aerial.webp", position: "54% 50%", depth: "far" },
-      { src: "/media/music/zimmer-orchestra.webp", position: "50% 48%", depth: "middle" },
+      { src: "/vehicles/optimized/skyline/skyline-hero-closed-v1-desktop.webp", position: "56% 56%", depth: "far" },
+      { src: "/vehicles/optimized/skyline/skyline-hero-xray-v1-desktop.webp", position: "57% 52%", depth: "middle" },
     ],
   },
   archive: {
     id: "archive",
     tone: "electric-cyan",
     layers: [
-      { src: "/media/archive/drifting.jpg", position: "52% 50%", depth: "far" },
-      { src: "/media/archive/parked.jpg", position: "50% 54%", depth: "near" },
+      { src: "/vehicles/optimized/senna/senna-exhaust-macro-v1-desktop.webp", position: "50% 50%", depth: "far" },
+      { src: "/vehicles/optimized/skyline/skyline-hero-xray-v1-desktop.webp", position: "61% 52%", depth: "near" },
     ],
   },
   resume: {
     id: "resume",
     tone: "blueprint-blue",
     layers: [
-      { src: "/media/football/stadium-aerial.webp", position: "50% 50%", depth: "far" },
-      { src: "/media/archive/skyline-engine.jpg", position: "50% 48%", depth: "near" },
+      { src: "/vehicles/optimized/senna/senna-body-macro-v1-desktop.webp", position: "46% 50%", depth: "far" },
+      { src: "/vehicles/optimized/skyline/skyline-hero-xray-v1-desktop.webp", position: "58% 52%", depth: "near" },
     ],
   },
   contact: {
     id: "contact",
     tone: "signal-gold",
     layers: [
-      { src: "/media/music/zimmer-stars.jpg", position: "50% 45%", depth: "far" },
-      { src: "/media/football/stadium-aerial.webp", position: "50% 50%", depth: "middle" },
+      { src: "/vehicles/optimized/senna/senna-body-macro-v1-desktop.webp", position: "52% 50%", depth: "far" },
+      { src: "/vehicles/optimized/senna/senna-exhaust-macro-v1-desktop.webp", position: "50% 50%", depth: "middle" },
     ],
   },
 };
@@ -138,14 +137,25 @@ export function RouteAtmosphere() {
           data-motion-depth={layer.depth}
           key={`${atmosphere.id}-${layer.src}`}
         >
-          <Image
-            src={layer.src}
-            alt=""
-            fill
-            sizes="100vw"
-            priority={index === 0}
-            style={{ objectPosition: layer.position }}
-          />
+          <picture>
+            <source
+              media="(max-width: 767px)"
+              srcSet={layer.src.replace("-desktop.webp", "-mobile.webp")}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={layer.src}
+              srcSet={`${layer.src.replace("-desktop.webp", "-mobile.webp")} 2160w, ${layer.src} 3840w`}
+              sizes="100vw"
+              alt=""
+              width={3840}
+              height={2161}
+              loading={index === 0 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : "auto"}
+              decoding="async"
+              style={{ objectPosition: layer.position }}
+            />
+          </picture>
         </div>
       ))}
       <div className="route-atmosphere__light" />

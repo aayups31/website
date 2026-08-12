@@ -1,5 +1,7 @@
 # Aayu Pratap Singh — Website Production Plan
 
+> Superseded on August 11, 2026 by `docs/AUTOMOTIVE_PRODUCTION_PLAN.md`. This document records the earlier environment-led direction only and is not the current build specification.
+
 **Updated:** August 2, 2026
 **Sources:** private `portfolio.md`, private résumé PDF, and owner-supplied image library
 

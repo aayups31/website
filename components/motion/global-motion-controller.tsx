@@ -26,7 +26,10 @@ const PROGRESS_SELECTOR = [
   ".kinetic-heading",
 ].join(",");
 
-const MAGNETIC_SELECTOR = "[data-motion-magnetic], [data-magnetic]";
+const MAGNETIC_SELECTOR = [
+  "[data-motion-magnetic]:not(a):not(.kinetic-heading)",
+  "[data-magnetic]:not(a):not(.kinetic-heading)",
+].join(",");
 
 function clamp(value: number, minimum = 0, maximum = 1) {
   return Math.min(maximum, Math.max(minimum, value));
@@ -100,6 +103,11 @@ export function GlobalMotionController() {
   }, [motionReduced]);
 
   useEffect(() => {
+    // The automotive homepage owns a single GSAP/Lenis render loop. Keeping the
+    // route-wide observer active there would introduce a competing scroll loop
+    // and re-animate typography independently of the vehicle choreography.
+    if (pathname === "/") return;
+
     const root = document.documentElement;
     const observedElements = new Set<HTMLElement>();
     const visibleProgressElements = new Set<HTMLElement>();

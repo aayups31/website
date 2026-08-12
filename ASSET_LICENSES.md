@@ -6,11 +6,12 @@ The motion system, masks, typography treatments, and SVG placeholders are origin
 | --- | --- | --- | --- |
 | Cinematic motion system and CSS treatments | Original code in this repository | Project-owned | Approved |
 | Archive placeholder SVGs | Original vectors in this repository | Project-owned | Approved |
-| Anybody Variable | Fontsource package | SIL Open Font License 1.1 | Approved |
 | Newsreader Variable | Fontsource package | SIL Open Font License 1.1 | Approved |
-| `public/media/football/*` (5 images) | Supplied by site owner | Original source / license not documented | Prototype only — clear before public release |
-| `public/media/racing/*` (4 images) | Supplied by site owner | Original source / license not documented; visible team/brand marks | Prototype only — clear before public release |
-| `public/media/music/*` (7 images) | Supplied by site owner | Original source / license not documented; artist likenesses and album/concert imagery | Prototype only — clear before public release |
-| `public/media/archive/*` (3 images) | Supplied by site owner | Original source / license not documented; `drifting.jpg` contains creator marks | Prototype only — clear or replace before public release |
+| Helvetica Neue / Helvetica / Arial stack | Visitor system fonts; no webfont file shipped | Platform font licenses | Approved |
+| `public/vehicles/{senna,f1,skyline}/*-v1.png` | Original AI-generated temporary vehicle plates produced for this project from owner-supplied composition references | Project prototype use; generated imagery still requires final model-accuracy and trademark review | Temporary production plate |
+| `public/vehicles/optimized/**` | Deterministic WebP derivatives of the original temporary plates | Same status as source plate | Temporary production plate |
+| `.reference-archive/legacy-public-media/*` (19 images) | Supplied by site owner; removed from `public/` in the automotive redesign | Original source / license not documented; includes visible marks, brands, and artist likenesses | Local reference only — ignored by Git and excluded from deployment |
 
 The site does not claim that these supplied studies are Aayu's photography or VFX work, and it does not imply affiliation with the depicted clubs, teams, brands, or artists. Replace or clear every provisional asset before a public production launch; record final creator credits, license terms, and usage scope here.
+
+The owner-supplied `Images/` directory is excluded from Git and from the production-asset pipeline. Its low-resolution stills and watermarked motion samples are composition references only and must never be served by the website. The temporary vehicle plates above are original outputs, contain no copied watermark or sponsor livery, and are deliberately presented as visual-development assets—not as licensed manufacturer renders or mechanically certified models.

@@ -10,6 +10,7 @@ coverage/
 playwright-report/
 test-results/
 qa/
+artifacts/
 *.tsbuildinfo
 
 # local environment
@@ -25,6 +26,7 @@ qa/
 Aayu_Resume.pdf
 portfolio.md
 Images/
+.reference-archive/
 
 # debug logs
 npm-debug.log*

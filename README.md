@@ -1,6 +1,6 @@
-# Aayu Pratap Singh — cinematic portfolio
+# Aayu Pratap Singh — automotive portfolio
 
-A content-first personal portfolio with scroll-scrubbed camera choreography, image-led cinematic worlds, and kinetic variable typography.
+A content-first personal portfolio built as one scroll-directed automotive film. A persistent visual stage moves through original Senna-inspired, Formula, and Skyline plates while semantic HTML carries Aayu's real experience, projects, creative practice, and contact details.
 
 ## Run locally
 
@@ -23,19 +23,20 @@ Open `http://127.0.0.1:3000`.
 - `npm run test:e2e` — desktop and mobile browser tests
 - `npm run build` — production build
 - `npm run check` — full verification pipeline
+- `node scripts/prepare-vehicle-assets.mjs` — regenerate optimized WebP plates (Node 22.13+)
 
 Set `NEXT_PUBLIC_SITE_URL` to the final production origin before deployment so
 canonical URLs, the sitemap, and the robots file point at the live domain.
 
 ## Experience principles
 
-- Semantic content never depends on the decorative motion layer.
-- Sound is opt-in and reduced motion is respected.
-- Full-screen 2.5D compositions use supplied stills as independently choreographed shots: dolly, pan, tilt, roll, focal shift, pointer depth, and short zoom-through cuts.
-- Only the active chapter and its neighboring image worlds are mounted at once.
-- Supporting routes share a lighter fixed camera atmosphere plus scroll, reveal, magnetic, and variable-type motion hooks.
-- Anybody Variable and Newsreader Variable are self-hosted; no third-party font request is made at runtime.
-- Supplied reference images are tracked in the rights ledger and remain provisional until publication rights are confirmed.
+- Vehicle, camera, masks, and text share one reversible GSAP master timeline.
+- Lenis runs through the GSAP ticker, avoiding competing scroll animation loops.
+- Text is clean system sans plus technical mono, with masked scroll reveals and no hover distortion.
+- Deferred Formula, Skyline, and creative media load shortly before each chapter.
+- Reduced motion is a purpose-built six-panel editorial edit rather than an empty or frozen film.
+- The owner-supplied `Images/` directory is reference-only, ignored by Git, and never requested by the site.
+- Original temporary plates are processed into 3840px desktop and 2160px mobile WebPs with a deterministic manifest.
 - VFX and photography areas are structured so final credited work can replace the current studies without redesigning the world.
 
-See `WEBSITE_PLAN.md` for the full production roadmap and `ASSET_LICENSES.md` for the rights ledger.
+See `docs/AUTOMOTIVE_PRODUCTION_PLAN.md` for the current production roadmap and `ASSET_LICENSES.md` for the rights ledger. `WEBSITE_PLAN.md` is retained as the superseded pre-automotive plan for history.
