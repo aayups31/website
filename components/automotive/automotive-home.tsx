@@ -2,51 +2,76 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { experience, projects, siteConfig } from "@/lib/content";
-import { resolveAutomotiveTimeline } from "@/lib/automotive-timeline";
+import { experience, projects, siteConfig, values } from "@/lib/content";
+import {
+  AUTOMOTIVE_EDIT,
+  resolveAutomotiveTimeline,
+  type AutomotiveChapterId,
+} from "@/lib/automotive-timeline";
 import { useExperienceStore } from "@/lib/experience-store";
+import { EngineModel, type EngineModelHandle } from "./engine-model";
+import {
+  ScrollFrameSequence,
+  type ScrollFrameSequenceHandle,
+} from "./scroll-frame-sequence";
 import styles from "./automotive-home.module.css";
 
-type DeferredChapter = "senna" | "f1" | "skyline" | "creative";
+type DeferredChapter = "experience" | "projects" | "creative";
 
-type VehiclePictureProps = {
-  base: string;
-  alt?: string;
-  className?: string;
-  loaded?: boolean;
-  priority?: boolean;
-};
+const chapterLinks: ReadonlyArray<{
+  id: AutomotiveChapterId;
+  label: string;
+  href: string;
+}> = [
+  { id: "about", label: "About", href: "#about" },
+  { id: "experience", label: "Experience", href: "#experience" },
+  { id: "projects", label: "Projects", href: "#projects" },
+  { id: "creative", label: "Creative", href: "#creative" },
+  { id: "contact", label: "Contact", href: "#contact" },
+];
 
 const chapterSources: Record<DeferredChapter, string[]> = {
-  senna: [
+  experience: [
+    "/vehicles/optimized/senna/senna-body-macro-v1",
     "/vehicles/optimized/senna/senna-wheel-macro-v1",
     "/vehicles/optimized/senna/senna-exhaust-macro-v1",
     "/vehicles/optimized/senna/senna-hero-closed-v1",
     "/vehicles/optimized/senna/senna-hero-open-v1",
   ],
-  f1: [
-    "/vehicles/optimized/f1/f1-hero-v1",
-    "/vehicles/optimized/f1/f1-cockpit-v1",
+  projects: [
+    "/vehicles/optimized/f1/ferrari/tyre-macro-v1",
+    "/vehicles/optimized/f1/ferrari/steering-cockpit-v1",
+    "/vehicles/optimized/f1/ferrari/suspension-macro-v1",
+    "/vehicles/optimized/f1/ferrari/front-hero-v1",
+    "/vehicles/optimized/f1/ferrari/side-speed-v1",
+    "/vehicles/optimized/f1/ferrari/rear-light-v1",
   ],
-  skyline: [
-    "/vehicles/optimized/skyline/skyline-hero-closed-v1",
-    "/vehicles/optimized/skyline/skyline-hero-xray-v1",
-  ],
-  creative: ["/vehicles/optimized/senna/senna-exhaust-macro-v1"],
+  creative: ["/vehicles/optimized/f1/ferrari/rear-light-v1"],
 };
 
-const chapterLinks = [
-  { id: "opening", label: "Start", href: "#opening" },
-  { id: "senna", label: "Experience", href: "#experience" },
-  { id: "f1", label: "Projects", href: "#projects" },
-  { id: "skyline", label: "About", href: "#about" },
-  { id: "creative", label: "Creative", href: "#creative" },
-  { id: "contact", label: "Contact", href: "#contact" },
-] as const;
+const doorFrames = [
+  "/vehicles/optimized/senna/door-open-v2/door-000",
+  "/vehicles/optimized/senna/door-open-v2/door-001",
+  "/vehicles/optimized/senna/door-open-v2/door-002",
+  "/vehicles/optimized/senna/door-open-v2/door-003",
+  "/vehicles/optimized/senna/door-open-v2/door-004",
+  "/vehicles/optimized/senna/door-open-v2/door-005",
+  "/vehicles/optimized/senna/door-open-v2/door-006",
+  "/vehicles/optimized/senna/door-open-v2/door-007",
+  "/vehicles/optimized/senna/door-open-v2/door-008",
+  "/vehicles/optimized/senna/door-open-v2/door-009",
+];
+
+function responsiveFrames(variant: "desktop" | "mobile") {
+  return doorFrames.map((frame) => `${frame}-${variant}.webp`);
+}
+
+const desktopDoorFrames = responsiveFrames("desktop");
+const mobileDoorFrames = responsiveFrames("mobile");
 
 function VehiclePicture({
   base,
@@ -54,7 +79,13 @@ function VehiclePicture({
   className,
   loaded = true,
   priority = false,
-}: VehiclePictureProps) {
+}: {
+  base: string;
+  alt?: string;
+  className?: string;
+  loaded?: boolean;
+  priority?: boolean;
+}) {
   if (!loaded) {
     return <span className={`${styles.mediaPlaceholder} ${className ?? ""}`} aria-hidden="true" />;
   }
@@ -64,11 +95,11 @@ function VehiclePicture({
       <source media="(max-width: 767px)" srcSet={`${base}-mobile.webp`} />
       <img
         src={`${base}-desktop.webp`}
-        srcSet={`${base}-mobile.webp 2160w, ${base}-desktop.webp 3840w`}
+        srcSet={`${base}-mobile.webp 1440w, ${base}-desktop.webp 2560w`}
         sizes="100vw"
         alt={alt}
-        width={3840}
-        height={2161}
+        width={2560}
+        height={1441}
         loading={priority ? "eager" : "lazy"}
         fetchPriority={priority ? "high" : "auto"}
         decoding="async"
@@ -96,28 +127,6 @@ function MaskLine({
   );
 }
 
-function preloadChapter(chapter: DeferredChapter) {
-  const desktop = window.matchMedia("(min-width: 768px)").matches;
-  const suffix = desktop ? "desktop" : "mobile";
-
-  return Promise.all(
-    chapterSources[chapter].map(
-      (base) =>
-        new Promise<void>((resolve) => {
-          const image = new Image();
-          image.onload = () => {
-            image.decode().catch(() => undefined).finally(resolve);
-          };
-          image.onerror = () => resolve();
-          image.src = `${base}-${suffix}.webp`;
-          if (image.complete) {
-            image.decode().catch(() => undefined).finally(resolve);
-          }
-        }),
-    ),
-  );
-}
-
 function ReducedChapter({
   eyebrow,
   title,
@@ -126,7 +135,7 @@ function ReducedChapter({
   imageAlt,
   align = "left",
   headingLevel = 2,
-  linksEnabled = true,
+  linksEnabled,
   children,
 }: {
   eyebrow: string;
@@ -136,19 +145,14 @@ function ReducedChapter({
   imageAlt?: string;
   align?: "left" | "right";
   headingLevel?: 1 | 2;
-  linksEnabled?: boolean;
+  linksEnabled: boolean;
   children?: React.ReactNode;
 }) {
   const Heading = headingLevel === 1 ? "h1" : "h2";
-
   return (
     <div className={styles.reducedPanel} data-align={align}>
       {image ? (
-        <VehiclePicture
-          base={image}
-          alt={imageAlt}
-          className={styles.reducedMedia}
-        />
+        <VehiclePicture base={image} alt={imageAlt} className={styles.reducedMedia} />
       ) : (
         <div className={styles.reducedEndFrame} aria-hidden="true" />
       )}
@@ -162,72 +166,131 @@ function ReducedChapter({
   );
 }
 
+function preloadChapter(chapter: DeferredChapter) {
+  const suffix = window.matchMedia("(max-width: 767px)").matches ? "mobile" : "desktop";
+  return Promise.all(
+    chapterSources[chapter].map(
+      (base) =>
+        new Promise<void>((resolve) => {
+          const image = new Image();
+          let settled = false;
+          const finish = () => {
+            if (settled) return;
+            settled = true;
+            image.decode().catch(() => undefined).finally(resolve);
+          };
+          image.onload = finish;
+          image.onerror = finish;
+          image.src = `${base}-${suffix}.webp`;
+          if (image.complete) finish();
+        }),
+    ),
+  );
+}
+
 export function AutomotiveHome() {
   const rootRef = useRef<HTMLElement>(null);
-  const scanFrameRef = useRef<number | null>(null);
-  const scanTargetRef = useRef<{ element: HTMLDivElement; x: number; y: number } | null>(null);
+  const engineRef = useRef<EngineModelHandle>(null);
+  const doorSequenceRef = useRef<ScrollFrameSequenceHandle>(null);
   const motionReduced = useExperienceStore((state) => state.motionReduced);
-  const [scanLocked, setScanLocked] = useState(false);
   const [loaded, setLoaded] = useState<Record<DeferredChapter, boolean>>({
-    senna: false,
-    f1: false,
-    skyline: false,
+    experience: false,
+    projects: false,
     creative: false,
   });
+  const [introReady, setIntroReady] = useState(false);
 
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
     if (motionReduced) {
-      setLoaded({ senna: true, f1: true, skyline: true, creative: true });
+      setLoaded({ experience: true, projects: true, creative: true });
       return;
     }
-
+    const root = rootRef.current;
+    if (!root) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
           const chapter = (entry.target as HTMLElement).dataset.loadChapter as
             | DeferredChapter
             | undefined;
-          if (!chapter) continue;
+          if (!chapter) return;
           observer.unobserve(entry.target);
           void preloadChapter(chapter).then(() => {
             setLoaded((current) =>
               current[chapter] ? current : { ...current, [chapter]: true },
             );
           });
-        }
+        });
       },
-      { rootMargin: "220% 0px", threshold: 0 },
+      { rootMargin: "160% 0px", threshold: 0 },
     );
-
-    root
-      .querySelectorAll<HTMLElement>("[data-load-chapter]")
-      .forEach((element) => observer.observe(element));
-
-    return () => observer.disconnect();
+      root.querySelectorAll<HTMLElement>("[data-load-chapter]").forEach((element) => {
+        observer.observe(element);
+      });
+    const preloadAhead = window.setTimeout(() => {
+      for (const chapter of ["experience", "projects", "creative"] as const) {
+        void preloadChapter(chapter).then(() => {
+          setLoaded((current) =>
+            current[chapter] ? current : { ...current, [chapter]: true },
+          );
+        });
+      }
+    }, 2200);
+    return () => {
+      window.clearTimeout(preloadAhead);
+      observer.disconnect();
+    };
   }, [motionReduced]);
 
-  useEffect(
-    () => () => {
-      if (scanFrameRef.current !== null) {
-        window.cancelAnimationFrame(scanFrameRef.current);
-      }
-    },
-    [],
-  );
+  useEffect(() => {
+    if (motionReduced) {
+      setIntroReady(true);
+      return;
+    }
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
+    const hero = new Image();
+    const start = performance.now();
+    let cancelled = false;
+    let timer: number | undefined;
+    const finish = () => {
+      const elapsed = performance.now() - start;
+      timer = window.setTimeout(() => {
+        if (!cancelled) setIntroReady(true);
+      }, Math.max(0, 1250 - elapsed));
+    };
+    hero.decoding = "async";
+    hero.onload = () => void hero.decode().catch(() => undefined).finally(finish);
+    hero.onerror = finish;
+    hero.src = `/vehicles/optimized/skyline/v2/skyline-hero-rear-three-quarter-v2-${mobile ? "mobile" : "desktop"}.webp`;
+    return () => {
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [motionReduced]);
+
+  const updateRuntime = useCallback((progress: number) => {
+    const state = resolveAutomotiveTimeline(progress);
+    const engineStart = AUTOMOTIVE_EDIT.engineModelStart / AUTOMOTIVE_EDIT.total;
+    const engineEnd = AUTOMOTIVE_EDIT.engineModelEnd / AUTOMOTIVE_EDIT.total;
+    engineRef.current?.update((progress - engineStart) / (engineEnd - engineStart));
+
+    const doorStart = AUTOMOTIVE_EDIT.doorStart / AUTOMOTIVE_EDIT.total;
+    const doorEnd = AUTOMOTIVE_EDIT.doorEnd / AUTOMOTIVE_EDIT.total;
+    doorSequenceRef.current?.update((progress - doorStart) / (doorEnd - doorStart));
+    return state;
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-
     root.dataset.motionMode = motionReduced ? "reduced" : "full";
+
     if (motionReduced) {
       root.dataset.ready = "true";
-      root.dataset.activeChapter = "opening";
-      document.documentElement.dataset.automotiveChapter = "opening";
+      root.dataset.activeChapter = "about";
+      root.dataset.activeShot = "identity";
+      document.documentElement.dataset.automotiveChapter = "about";
       return () => {
         delete document.documentElement.dataset.automotiveChapter;
       };
@@ -239,10 +302,9 @@ export function AutomotiveHome() {
     let lenis: Lenis | null = null;
 
     const updateProgress = (progress: number) => {
-      const state = resolveAutomotiveTimeline(progress);
+      const state = updateRuntime(progress);
       root.style.setProperty("--automotive-progress", state.progress.toFixed(5));
       root.dataset.activeShot = state.shotId;
-
       if (lastChapter === state.chapterId) return;
       lastChapter = state.chapterId;
       root.dataset.activeChapter = state.chapterId;
@@ -250,7 +312,7 @@ export function AutomotiveHome() {
       select<HTMLElement>("[data-chapter-link]").forEach((link) => {
         const active = link.dataset.chapterLink === state.chapterId;
         link.toggleAttribute("data-active", active);
-        if (active) link.setAttribute("aria-current", "true");
+        if (active) link.setAttribute("aria-current", "location");
         else link.removeAttribute("aria-current");
       });
     };
@@ -264,23 +326,15 @@ export function AutomotiveHome() {
       gsap.set(scenes, { autoAlpha: 0 });
       gsap.set(shots, { autoAlpha: 0 });
       gsap.set(copies, { autoAlpha: 0 });
-      gsap.set(lines, { yPercent: 112 });
-
-      // The timeline's time-zero callbacks are not guaranteed to render until
-      // ScrollTrigger receives its first non-zero update. Establish a complete
-      // opening frame eagerly so a fresh load never flashes or settles on black.
-      gsap.set(select('[data-scene="opening"]'), { autoAlpha: 1 });
-      gsap.set(select('[data-shot="opening-body"]'), {
-        autoAlpha: 1,
-        scale: 1.72,
-        xPercent: -6,
-        yPercent: 4,
-      });
+      gsap.set(lines, { yPercent: 118 });
+      gsap.set(select('[data-scene="about"]'), { autoAlpha: 1 });
+      gsap.set(select('[data-shot="skyline-intro"]'), { autoAlpha: 1 });
+      gsap.set(select('[data-copy="about-identity"]'), { autoAlpha: 1 });
 
       const timeline = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
-          id: "automotive-master",
+          id: "automotive-master-v2",
           trigger: root,
           start: "top top",
           end: "bottom bottom",
@@ -290,320 +344,276 @@ export function AutomotiveHome() {
         },
       });
 
-      const revealCopy = (id: string, at: number, hold: number) => {
+      const copyBeat = (id: string, start: number, end: number) => {
         const block = select<HTMLElement>(`[data-copy="${id}"]`);
         const blockLines = select<HTMLElement>(`[data-copy="${id}"] [data-line-inner]`);
+        const span = end - start;
+        const enter = span * 0.15;
+        const exit = span * 0.15;
         timeline
-          .set(block, { autoAlpha: 1 }, at)
+          .set(block, { autoAlpha: 1 }, start)
           .fromTo(
             blockLines,
-            { yPercent: 112 },
-            { yPercent: 0, duration: 0.62, stagger: 0.08, ease: "power3.out" },
-            at,
+            { yPercent: 118 },
+            { yPercent: 0, duration: enter, stagger: enter * 0.08, ease: "power4.out" },
+            start,
           )
           .to(
             blockLines,
-            { yPercent: -108, duration: 0.48, stagger: 0.045, ease: "power2.in" },
-            at + hold,
+            { yPercent: -112, duration: exit, stagger: exit * 0.06, ease: "power3.in" },
+            end - exit,
           )
-          .set(block, { autoAlpha: 0 }, at + hold + 0.5);
+          .set(block, { autoAlpha: 0 }, end);
       };
 
       timeline
-        .addLabel("opening", 0)
-        .set(select('[data-scene="opening"]'), { autoAlpha: 1 }, 0)
-        .set(select('[data-shot="opening-body"]'), { autoAlpha: 1 }, 0)
+        .addLabel("about", 0)
         .fromTo(
-          select('[data-shot="opening-body"]'),
-          { scale: 1.72, xPercent: -6, yPercent: 4 },
-          { scale: 1.08, xPercent: 0, yPercent: 0, duration: 8.7 },
+          select('[data-camera="skyline"]'),
+          { z: -180, rotationX: 3.5, rotationY: -5, scale: 1.2 },
+          { z: 0, rotationX: 0, rotationY: 0, scale: 1, duration: 11.4 },
           0,
         )
         .fromTo(
-          select("[data-opening-rule]"),
-          { scaleX: 0 },
-          { scaleX: 1, duration: 3.2, ease: "power3.inOut" },
-          1.2,
+          select('[data-shot="skyline-intro"]'),
+          { scale: 1.32, xPercent: -7, yPercent: 3 },
+          { scale: 1.03, xPercent: 0, yPercent: 0, duration: 13.8 },
+          0,
         )
-        .to(select("[data-opening-glow]"), { opacity: 0.82, duration: 4.8 }, 0.8);
-
-      revealCopy("opening-identity", 2.2, 5.7);
-
-      timeline
-        .addLabel("senna", 10)
-        .set(select('[data-scene="senna"]'), { autoAlpha: 1 }, 8.9)
-        .set(select('[data-shot="senna-body"]'), { autoAlpha: 1 }, 8.9)
         .fromTo(
-          select('[data-shot="senna-body"]'),
-          { scale: 1.2, clipPath: "inset(42% 0 42% 0)" },
-          {
-            scale: 1,
-            clipPath: "inset(0% 0 0% 0)",
-            duration: 4.5,
-            ease: "power2.inOut",
-          },
-          9.1,
+          select("[data-orbit-ring]"),
+          { rotate: -22, scale: 0.7, opacity: 0 },
+          { rotate: 18, scale: 1, opacity: 0.55, duration: 10.5, ease: "power3.out" },
+          1,
+        );
+      timeline
+        .fromTo(
+          select('[data-copy="about-identity"] [data-line-inner]'),
+          { yPercent: 118 },
+          { yPercent: 0, duration: 2.6, stagger: 0.12, ease: "power4.out", immediateRender: true },
+          0,
         )
-        .to(select('[data-scene="opening"]'), { autoAlpha: 0, duration: 1.4 }, 9.2);
-
-      revealCopy("senna-intro", 11.4, 3.2);
+        .to(
+          select('[data-copy="about-identity"] [data-line-inner]'),
+          { yPercent: -112, duration: 2, stagger: 0.08, ease: "power3.in" },
+          12,
+        )
+        .set(select('[data-copy="about-identity"]'), { autoAlpha: 0 }, 14);
 
       timeline
-        .set(select('[data-shot="senna-wheel"]'), { autoAlpha: 1 }, 14.7)
+        .set(select('[data-shot="skyline-side"]'), { autoAlpha: 1 }, 14)
+        .fromTo(
+          select('[data-shot="skyline-side"]'),
+          { clipPath: "circle(0% at 22% 50%)", scale: 1.16, xPercent: 7 },
+          { clipPath: "circle(118% at 22% 50%)", scale: 1, xPercent: 0, duration: 5.5, ease: "power3.inOut" },
+          14,
+        )
+        .to(select('[data-shot="skyline-intro"]'), { autoAlpha: 0, duration: 2.5 }, 16.8);
+      copyBeat("about-values", 19.5, 30);
+
+      timeline
+        .set(select('[data-shot="engine-closed"]'), { autoAlpha: 1 }, 29.2)
+        .fromTo(
+          select('[data-shot="engine-closed"]'),
+          { clipPath: "inset(50% 0 50% 0)", scale: 1.25 },
+          { clipPath: "inset(0% 0 0% 0)", scale: 1.02, duration: 6.4, ease: "power4.inOut" },
+          29.2,
+        )
+        .to(select('[data-shot="skyline-side"]'), { autoAlpha: 0, duration: 2.4 }, 32.5)
+        .set(select('[data-shot="engine-open"]'), { autoAlpha: 1 }, 35)
+        .fromTo(
+          select('[data-shot="engine-open"]'),
+          { clipPath: "circle(0% at 50% 42%)", scale: 1.18 },
+          { clipPath: "circle(88% at 50% 42%)", scale: 1.03, duration: 7, ease: "power3.inOut" },
+          35,
+        )
+        .fromTo(
+          select("[data-ink-reveal]"),
+          { opacity: 0, scale: 0.36, rotate: -7 },
+          { opacity: 0.9, scale: 1.3, rotate: 4, duration: 5.4, ease: "power2.inOut" },
+          34.7,
+        )
+        .fromTo(
+          select("[data-glitch-band]"),
+          { xPercent: -120, opacity: 0 },
+          { xPercent: 120, opacity: 0.76, duration: 3.8, stagger: 0.24, ease: "power3.inOut" },
+          36,
+        );
+      copyBeat("about-engine", 40.5, 49.5);
+
+      timeline
+        .fromTo(
+          select("[data-engine-model-wrap]"),
+          { autoAlpha: 0, scale: 0.78, rotateY: -14 },
+          { autoAlpha: 1, scale: 1, rotateY: 0, duration: 6.4, ease: "power4.out" },
+          44.5,
+        )
+        .to(select('[data-shot="engine-closed"]'), { autoAlpha: 0, duration: 2 }, 44.5)
+        .to(select('[data-shot="engine-open"]'), { autoAlpha: 0.22, duration: 3 }, 47)
+        .to(select('[data-camera="skyline"]'), { z: 260, rotationY: 7, duration: 5.5 }, 50.5)
+        .to(select('[data-scene="about"]'), { autoAlpha: 0, duration: 2.4 }, 54.8)
+        .addLabel("experience", 56)
+        .set(select('[data-scene="experience"]'), { autoAlpha: 1 }, 54.4)
+        .set(select('[data-shot="senna-carbon"]'), { autoAlpha: 1 }, 54.4)
+        .fromTo(
+          select('[data-camera="senna"]'),
+          { z: -240, rotationY: -8, scale: 1.28 },
+          { z: 0, rotationY: 0, scale: 1, duration: 8.8, ease: "power3.inOut" },
+          54.4,
+        )
+        .fromTo(
+          select('[data-shot="senna-carbon"]'),
+          { clipPath: "circle(8% at 60% 54%)", scale: 1.42 },
+          { clipPath: "circle(118% at 60% 54%)", scale: 1.04, duration: 8.2, ease: "power3.inOut" },
+          54.4,
+        );
+      copyBeat("experience-intro", 60.5, 70);
+
+      timeline
+        .set(select('[data-shot="senna-wheel"]'), { autoAlpha: 1 }, 68)
         .fromTo(
           select('[data-shot="senna-wheel"]'),
-          { clipPath: "circle(0% at 69% 58%)", scale: 1.22 },
-          {
-            clipPath: "circle(88% at 69% 58%)",
-            scale: 1,
-            duration: 2.5,
-            ease: "power3.inOut",
-          },
-          14.7,
+          { clipPath: "circle(0% at 70% 58%)", scale: 1.3 },
+          { clipPath: "circle(105% at 70% 58%)", scale: 1.03, duration: 6.2, ease: "power4.inOut" },
+          68,
         )
-        .to(select('[data-shot="senna-body"]'), { autoAlpha: 0, duration: 0.8 }, 16.3)
-        .to(select('[data-wheel-ring]'), { rotate: 38, duration: 4.2 }, 15.4);
-
-      revealCopy("experience-0", 17.1, 3.1);
+        .to(select('[data-shot="senna-carbon"]'), { autoAlpha: 0, duration: 2.5 }, 72);
+      copyBeat("experience-0", 75, 86);
 
       timeline
-        .set(select('[data-shot="senna-exhaust"]'), { autoAlpha: 1 }, 20.4)
+        .set(select('[data-shot="senna-exhaust"]'), { autoAlpha: 1 }, 84.5)
         .fromTo(
           select('[data-shot="senna-exhaust"]'),
-          { clipPath: "polygon(46% 0, 54% 0, 54% 100%, 46% 100%)", scale: 1.14 },
-          {
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-            scale: 1,
-            duration: 2.2,
-            ease: "power3.inOut",
-          },
-          20.4,
+          { clipPath: "polygon(48% 0,52% 0,60% 100%,40% 100%)", scale: 1.22 },
+          { clipPath: "polygon(0 0,100% 0,100% 100%,0 100%)", scale: 1.02, duration: 5.8, ease: "power4.inOut" },
+          84.5,
         )
-        .to(select('[data-shot="senna-wheel"]'), { autoAlpha: 0, duration: 0.9 }, 21.2)
+        .to(select('[data-shot="senna-wheel"]'), { autoAlpha: 0, duration: 2.5 }, 88);
+      copyBeat("experience-1", 91.5, 102.5);
+
+      timeline
+        .set(select('[data-shot="senna-settle"]'), { autoAlpha: 1 }, 101)
         .fromTo(
-          select("[data-heat-line]"),
-          { scaleY: 0, opacity: 0 },
-          { scaleY: 1, opacity: 0.72, duration: 1.6, ease: "power2.out" },
-          21.2,
+          select('[data-shot="senna-settle"]'),
+          { clipPath: "circle(0% at 50% 60%)", scale: 1.18 },
+          { clipPath: "circle(100% at 50% 60%)", scale: 1, duration: 7, ease: "power4.inOut" },
+          101,
+        )
+        .to(select('[data-shot="senna-exhaust"]'), { autoAlpha: 0, duration: 2.5 }, 105)
+        .set(select('[data-shot="senna-door-sequence"]'), { autoAlpha: 1 }, 110)
+        .to(select('[data-shot="senna-settle"]'), { autoAlpha: 0, duration: 2.2 }, 112);
+      copyBeat("experience-2", 105.5, 116);
+      copyBeat("experience-close", 119, 130.5);
+
+      timeline
+        .set(select('[data-shot="ferrari-tyre"]'), { autoAlpha: 1 }, 130)
+        .fromTo(
+          select('[data-shot="ferrari-tyre"]'),
+          { clipPath: "circle(0% at 76% 56%)", scale: 1.55 },
+          { clipPath: "circle(115% at 76% 56%)", scale: 1.03, duration: 7.2, ease: "power4.inOut" },
+          130,
+        )
+        .to(select('[data-scene="experience"]'), { autoAlpha: 0, duration: 2.8 }, 134)
+        .addLabel("projects", 136)
+        .set(select('[data-scene="projects"]'), { autoAlpha: 1 }, 130)
+        .fromTo(
+          select('[data-camera="ferrari"]'),
+          { z: -210, rotationX: 4, rotationY: 7, scale: 1.2 },
+          { z: 0, rotationX: 0, rotationY: 0, scale: 1, duration: 8 },
+          130,
         );
-
-      revealCopy("experience-1", 22.6, 3.1);
-
-      timeline
-        .set(select('[data-shot="senna-closed"]'), { autoAlpha: 1 }, 25.7)
-        .fromTo(
-          select('[data-shot="senna-closed"]'),
-          { clipPath: "inset(0 50% 0 50%)", scale: 1.09 },
-          {
-            clipPath: "inset(0 0% 0 0%)",
-            scale: 1,
-            duration: 2.7,
-            ease: "power3.inOut",
-          },
-          25.7,
-        )
-        .to(select('[data-shot="senna-exhaust"]'), { autoAlpha: 0, duration: 0.9 }, 26.4);
-
-      revealCopy("experience-2", 28.2, 2.9);
+      copyBeat("projects-intro", 138, 148);
 
       timeline
-        .set(select('[data-shot="senna-open"]'), { autoAlpha: 1 }, 31.4)
+        .set(select('[data-shot="ferrari-controls"]'), { autoAlpha: 1 }, 146.5)
         .fromTo(
-          select('[data-shot="senna-open"]'),
-          {
-            clipPath: "polygon(47% 0, 53% 0, 58% 100%, 42% 100%)",
-            filter: "brightness(0.45)",
-          },
-          {
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-            filter: "brightness(1)",
-            duration: 3,
-            ease: "power2.inOut",
-          },
-          31.4,
+          select('[data-shot="ferrari-controls"]'),
+          { clipPath: "inset(50% 0 50% 0)", scale: 1.18, xPercent: 5 },
+          { clipPath: "inset(0% 0 0% 0)", scale: 1.02, xPercent: 0, duration: 6.5, ease: "power4.inOut" },
+          146.5,
         )
-        .fromTo(
-          select("[data-door-light]"),
-          { xPercent: -125, opacity: 0 },
-          { xPercent: 125, opacity: 0.8, duration: 2.7, ease: "power2.inOut" },
-          31.5,
-        );
-
-      revealCopy("experience-close", 32.5, 2.7);
+        .to(select('[data-shot="ferrari-tyre"]'), { autoAlpha: 0, duration: 2.4 }, 150.5);
+      copyBeat("project-0", 154, 166);
 
       timeline
-        .set(select('[data-shot="senna-transition"]'), { autoAlpha: 1 }, 35.7)
+        .set(select('[data-shot="ferrari-suspension"]'), { autoAlpha: 1 }, 164)
         .fromTo(
-          select('[data-shot="senna-transition"]'),
-          { clipPath: "circle(10% at 68% 58%)", scale: 0.9, rotate: 0 },
-          {
-            clipPath: "circle(120% at 68% 58%)",
-            scale: 2.7,
-            rotate: 34,
-            duration: 2.7,
-            ease: "power3.in",
-          },
-          35.7,
+          select('[data-shot="ferrari-suspension"]'),
+          { clipPath: "circle(0% at 24% 52%)", scale: 1.22 },
+          { clipPath: "circle(116% at 24% 52%)", scale: 1.02, duration: 6.5, ease: "power4.inOut" },
+          164,
         )
-        .to(select('[data-shot="senna-open"]'), { autoAlpha: 0, duration: 0.8 }, 36.8)
-        .addLabel("f1", 38)
-        .set(select('[data-scene="f1"]'), { autoAlpha: 1 }, 37.2)
-        .set(select('[data-shot="f1-hero"]'), { autoAlpha: 1 }, 37.2)
-        .fromTo(
-          select('[data-shot="f1-hero"]'),
-          { clipPath: "circle(0% at 50% 58%)", scale: 1.12 },
-          {
-            clipPath: "circle(95% at 50% 58%)",
-            scale: 1,
-            duration: 3.1,
-            ease: "power3.inOut",
-          },
-          37.2,
-        )
-        .to(select('[data-scene="senna"]'), { autoAlpha: 0, duration: 1 }, 38.7);
-
-      revealCopy("f1-intro", 40.2, 2.7);
-      revealCopy("project-0", 43.2, 2.4);
+        .to(select('[data-shot="ferrari-controls"]'), { autoAlpha: 0, duration: 2.5 }, 168);
+      copyBeat("project-1", 171.5, 183.5);
 
       timeline
-        .set(select('[data-shot="f1-cockpit"]'), { autoAlpha: 1 }, 45.7)
+        .set(select('[data-shot="ferrari-hero"]'), { autoAlpha: 1 }, 181.5)
         .fromTo(
-          select('[data-shot="f1-cockpit"]'),
-          { clipPath: "inset(50% 0 50% 0)", scale: 1.14 },
-          {
-            clipPath: "inset(0% 0 0% 0)",
-            scale: 1,
-            duration: 2,
-            ease: "power3.inOut",
-          },
-          45.7,
+          select('[data-shot="ferrari-hero"]'),
+          { clipPath: "circle(0% at 68% 58%)", scale: 1.18 },
+          { clipPath: "circle(110% at 68% 58%)", scale: 1, duration: 7, ease: "power4.inOut" },
+          181.5,
         )
-        .to(select('[data-shot="f1-hero"]'), { autoAlpha: 0, duration: 0.8 }, 46.8);
-
-      revealCopy("project-1", 46.1, 2.35);
-      revealCopy("project-2", 49, 2.35);
+        .to(select('[data-shot="ferrari-suspension"]'), { autoAlpha: 0, duration: 2.7 }, 185.5);
+      copyBeat("projects-index", 189.5, 201.5);
 
       timeline
-        .set(select('[data-shot="f1-hero-return"]'), { autoAlpha: 1 }, 51.5)
+        .set(select('[data-shot="ferrari-speed"]'), { autoAlpha: 1 }, 199)
         .fromTo(
-          select('[data-shot="f1-hero-return"]'),
-          { clipPath: "polygon(0 0, 0 0, 0 100%, 0 100%)", scale: 1.08 },
-          {
-            clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-            scale: 1,
-            duration: 2.1,
-            ease: "power3.inOut",
-          },
-          51.5,
+          select('[data-shot="ferrari-speed"]'),
+          { clipPath: "inset(0 100% 0 0)", scale: 1.12, xPercent: 7 },
+          { clipPath: "inset(0 0% 0 0)", scale: 1.02, xPercent: -2, duration: 7, ease: "power4.inOut" },
+          199,
         )
-        .to(select('[data-shot="f1-cockpit"]'), { autoAlpha: 0, duration: 0.7 }, 52.8);
-
-      revealCopy("project-3", 52, 2.3);
-      revealCopy("project-4", 55, 2.65);
-
-      timeline
+        .to(select('[data-shot="ferrari-hero"]'), { autoAlpha: 0, duration: 2.8 }, 203)
+        .set(select('[data-shot="ferrari-rear"]'), { autoAlpha: 1 }, 210)
         .fromTo(
-          select("[data-f1-speedline]"),
-          { scaleX: 0, opacity: 0 },
-          { scaleX: 1, opacity: 0.7, duration: 2.2, ease: "power3.inOut" },
-          57.7,
+          select('[data-shot="ferrari-rear"]'),
+          { clipPath: "circle(0% at 50% 63%)", scale: 1.25 },
+          { clipPath: "circle(112% at 50% 63%)", scale: 1, duration: 7, ease: "power4.inOut" },
+          210,
         )
-        .fromTo(
-          select("[data-red-orb]"),
-          { scale: 0.06, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 3.2, ease: "power3.in" },
-          58.8,
-        )
-        .addLabel("skyline", 62)
-        .set(select('[data-scene="skyline"]'), { autoAlpha: 1 }, 61.1)
-        .set(select('[data-shot="skyline-closed"]'), { autoAlpha: 1 }, 61.1)
-        .set(select('[data-shot="skyline-xray"]'), { autoAlpha: 1 }, 61.1)
-        .fromTo(
-          select('[data-scene="skyline"]'),
-          { clipPath: "circle(0% at 75% 60%)" },
-          {
-            clipPath: "circle(110% at 75% 60%)",
-            duration: 2.8,
-            ease: "power3.inOut",
-          },
-          61.1,
-        )
-        .fromTo(
-          select('[data-shot="skyline-closed"]'),
-          { scale: 1.12 },
-          { scale: 1, duration: 3.6, ease: "power2.out" },
-          61.5,
-        )
-        .to(select('[data-scene="f1"]'), { autoAlpha: 0, duration: 1 }, 62.3);
-
-      revealCopy("skyline-intro", 64.5, 2.9);
-      revealCopy("about-primary", 68, 3.4);
-      revealCopy("about-scan", 72.1, 4.2);
-
-      timeline
-        .fromTo(
-          select("[data-tail-ring]"),
-          { scale: 0.2, opacity: 0 },
-          { scale: 1, opacity: 0.86, duration: 2.7, stagger: 0.18, ease: "power3.out" },
-          77,
-        )
-        .addLabel("creative", 80)
-        .set(select('[data-scene="creative"]'), { autoAlpha: 1 }, 79.1)
+        .to(select('[data-shot="ferrari-speed"]'), { autoAlpha: 0, duration: 2.5 }, 214)
+        .to(select('[data-camera="ferrari"]'), { z: 250, rotationY: -7, duration: 6 }, 215)
+        .addLabel("creative", 224)
+        .set(select('[data-scene="creative"]'), { autoAlpha: 1 }, 220)
         .fromTo(
           select("[data-aperture]"),
-          { clipPath: "circle(0% at 72% 58%)", rotate: -14 },
-          {
-            clipPath: "circle(82% at 72% 58%)",
-            rotate: 0,
-            duration: 3.2,
-            ease: "power3.inOut",
-          },
-          79.1,
+          { clipPath: "circle(0% at 50% 62%)", rotate: -10, scale: 0.7 },
+          { clipPath: "circle(90% at 50% 62%)", rotate: 0, scale: 1, duration: 8, ease: "power4.inOut" },
+          220,
         )
-        .to(select('[data-scene="skyline"]'), { autoAlpha: 0, duration: 1 }, 80.5);
-
-      revealCopy("creative-intro", 82, 2.15);
-      revealCopy("creative-vfx", 84.7, 2.15);
-      revealCopy("creative-photo", 87.4, 2.35);
+        .to(select('[data-scene="projects"]'), { autoAlpha: 0, duration: 3 }, 224);
+      copyBeat("creative-intro", 229, 239);
+      copyBeat("creative-vfx", 241, 251.5);
+      copyBeat("creative-photo", 253.5, 264);
 
       timeline
-        .to(
-          select("[data-aperture-blades]"),
-          { rotate: 62, scale: 0.14, opacity: 0.15, duration: 3.1, ease: "power3.in" },
-          90.8,
-        )
-        .to(select('[data-scene="creative"]'), { autoAlpha: 0, duration: 1.2 }, 92.8)
-        .addLabel("contact", 94)
-        .set(select('[data-scene="contact"]'), { autoAlpha: 1 }, 93.2)
-        .fromTo(
-          select("[data-contact-rule]"),
-          { scaleX: 0 },
-          { scaleX: 1, duration: 2.2, ease: "power3.inOut" },
-          94.2,
-        );
-
-      revealCopy("contact", 95, 4.4);
-      timeline.to({}, { duration: 0.1 }, 99.9);
+        .to(select("[data-aperture-blades]"), { rotate: 70, scale: 0.08, opacity: 0, duration: 7, ease: "power4.inOut" }, 260)
+        .to(select('[data-scene="creative"]'), { autoAlpha: 0, duration: 3 }, 265)
+        .addLabel("contact", 266)
+        .set(select('[data-scene="contact"]'), { autoAlpha: 1 }, 264)
+        .fromTo(select("[data-contact-rule]"), { scaleX: 0 }, { scaleX: 1, duration: 5.5, ease: "power4.inOut" }, 266);
+      copyBeat("contact", 269, 283);
+      timeline.to({}, { duration: 1 }, 284);
     }, root);
 
-    const saveData = (navigator as Navigator & {
-      connection?: { saveData?: boolean };
-    }).connection?.saveData;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     let tick: ((time: number) => void) | null = null;
     let onLenisScroll: (() => void) | null = null;
-
-    // Native touch scrolling is already smooth and keeps input latency low.
-    // Lenis is reserved for precise wheel/trackpad devices and disabled for
-    // Save-Data visitors; either path still drives the same ScrollTrigger.
     if (finePointer && !saveData) {
       lenis = new Lenis({
         autoRaf: false,
-        anchors: true,
-        lerp: 0.09,
+        anchors: {
+          duration: 1.2,
+          easing: (value: number) => 1 - Math.pow(1 - value, 4),
+          lock: true,
+        },
+        lerp: 0.055,
         smoothWheel: true,
         syncTouch: false,
-        wheelMultiplier: 0.9,
+        wheelMultiplier: 0.68,
       });
       onLenisScroll = () => ScrollTrigger.update();
       tick = (time: number) => lenis?.raf(time * 1000);
@@ -612,10 +622,9 @@ export function AutomotiveHome() {
       gsap.ticker.lagSmoothing(0);
     }
 
-    updateProgress(ScrollTrigger.getById("automotive-master")?.progress ?? 0);
+    updateProgress(ScrollTrigger.getById("automotive-master-v2")?.progress ?? 0);
     root.dataset.ready = "true";
     const refreshFrame = window.requestAnimationFrame(() => ScrollTrigger.refresh());
-
     return () => {
       window.cancelAnimationFrame(refreshFrame);
       if (tick) gsap.ticker.remove(tick);
@@ -626,23 +635,9 @@ export function AutomotiveHome() {
       delete root.dataset.ready;
       delete document.documentElement.dataset.automotiveChapter;
     };
-  }, [motionReduced]);
+  }, [motionReduced, updateRuntime]);
 
-  const moveScanner = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType === "touch") return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / Math.max(1, rect.width)) * 100;
-    const y = ((event.clientY - rect.top) / Math.max(1, rect.height)) * 100;
-    scanTargetRef.current = { element: event.currentTarget, x, y };
-    if (scanFrameRef.current !== null) return;
-    scanFrameRef.current = window.requestAnimationFrame(() => {
-      scanFrameRef.current = null;
-      const target = scanTargetRef.current;
-      if (!target) return;
-      target.element.style.setProperty("--scan-x", `${target.x.toFixed(2)}%`);
-      target.element.style.setProperty("--scan-y", `${target.y.toFixed(2)}%`);
-    });
-  };
+  const featuredProjects = projects.slice(0, 3);
 
   return (
     <main
@@ -650,293 +645,184 @@ export function AutomotiveHome() {
       ref={rootRef}
       className={styles.root}
       data-automotive-home
-      data-active-chapter="opening"
+      data-active-chapter="about"
+      data-active-shot="identity"
       data-motion-mode={motionReduced ? "reduced" : "full"}
-      data-scan-locked={scanLocked || undefined}
+      data-intro-ready={introReady || undefined}
     >
+      <div className={styles.introCurtain} aria-hidden="true">
+        <span className={styles.introAperture} />
+        <span className={styles.introMark}>APS</span>
+        <span className={styles.introSignal}>Identity / systems / image</span>
+      </div>
+
       <div className={styles.stage} aria-hidden="true">
-        <div className={styles.scene} data-scene="opening">
-          <div className={`${styles.shot} ${styles.openingBody}`} data-shot="opening-body">
-            <VehiclePicture
-              base="/vehicles/optimized/senna/senna-body-macro-v1"
-              className={styles.media}
-              priority
-            />
+        <div className={styles.scene} data-scene="about">
+          <div className={styles.camera} data-camera="skyline">
+            <div className={`${styles.shot} ${styles.skylineIntro}`} data-shot="skyline-intro">
+              <VehiclePicture base="/vehicles/optimized/skyline/v2/skyline-hero-rear-three-quarter-v2" className={styles.media} priority />
+            </div>
+            <div className={`${styles.shot} ${styles.skylineSide}`} data-shot="skyline-side">
+              <VehiclePicture base="/vehicles/optimized/skyline/v2/skyline-side-profile-v2" className={styles.media} />
+            </div>
+            <div className={`${styles.shot} ${styles.engineClosed}`} data-shot="engine-closed">
+              <VehiclePicture base="/vehicles/optimized/skyline/v2/skyline-engine-front-closed-reg-v2" className={styles.media} />
+            </div>
+            <div className={`${styles.shot} ${styles.engineOpen}`} data-shot="engine-open">
+              <VehiclePicture base="/vehicles/optimized/skyline/v2/skyline-engine-front-open-reg-v2" className={styles.media} />
+            </div>
           </div>
-          <div className={styles.openingShade} />
-          <div className={styles.openingGlow} data-opening-glow />
-          <span className={styles.openingRule} data-opening-rule />
-          <div className={`${styles.copy} ${styles.openingCopy}`} data-copy="opening-identity">
-            <p className={styles.eyebrow}>Aayu Pratap Singh · Waterloo, Ontario</p>
+
+          <div className={styles.inkReveal} data-ink-reveal>
+            <picture>
+              <source media="(max-width: 767px)" srcSet="/vehicles/optimized/effects/skyline-engine-ink-mask-v1-mobile.webp" />
+              <img src="/vehicles/optimized/effects/skyline-engine-ink-mask-v1-desktop.webp" alt="" />
+            </picture>
+          </div>
+          <div className={styles.glitchBands}>
+            <i data-glitch-band />
+            <i data-glitch-band />
+            <i data-glitch-band />
+          </div>
+          <div className={styles.engineModelWrap} data-engine-model-wrap>
+            <EngineModel ref={engineRef} className={styles.engineModel} enabled={!motionReduced} />
+            <span className={styles.engineModelHalo} />
+            <span className={styles.engineModelLabel}>Inline six / procedural study</span>
+          </div>
+
+          <div className={styles.orbitUi} data-orbit-ring>
+            <span />
+            <i />
+            <b>43.47° N</b>
+          </div>
+          <div className={`${styles.copy} ${styles.identityCopy}`} data-copy="about-identity">
+            <p className={styles.eyebrow}>About / {siteConfig.name} · {siteConfig.location}</p>
             <h1 className={styles.displayTitle}>
-              <MaskLine>Aayu Pratap</MaskLine>
-              <MaskLine className={styles.indentedLine}>Singh</MaskLine>
+              <MaskLine>I build systems</MaskLine>
+              <MaskLine className={styles.indentedLine}>that move.</MaskLine>
             </h1>
-            <MaskLine className={styles.copyDeck}>
-              Computer science · engineering · motion
-            </MaskLine>
+            <MaskLine className={styles.copyDeck}>{siteConfig.title} · visual storyteller</MaskLine>
+          </div>
+          <div className={`${styles.copy} ${styles.copyRight} ${styles.factCopy}`} data-copy="about-values">
+            <p className={styles.eyebrow}>Computer Science / University of Waterloo</p>
+            <h2 className={styles.factTitle}>
+              <MaskLine>{values[1].title}</MaskLine>
+            </h2>
+            <MaskLine className={styles.factBody}>{values[1].copy}</MaskLine>
+          </div>
+          <div className={`${styles.copy} ${styles.copyLeft} ${styles.factCopy}`} data-copy="about-engine">
+            <p className={styles.eyebrow}>Under the surface / how I think</p>
+            <h2 className={styles.factTitle}>
+              <MaskLine>{values[0].title}</MaskLine>
+            </h2>
+            <MaskLine className={styles.factBody}>{values[0].copy}</MaskLine>
           </div>
         </div>
 
-        <div className={styles.scene} data-scene="senna">
-          <div className={`${styles.shot} ${styles.sennaBody}`} data-shot="senna-body">
-            <VehiclePicture
-              base="/vehicles/optimized/senna/senna-body-macro-v1"
-              className={styles.media}
-            />
+        <div className={styles.scene} data-scene="experience">
+          <div className={styles.camera} data-camera="senna">
+            <div className={`${styles.shot} ${styles.sennaCarbon}`} data-shot="senna-carbon">
+              <VehiclePicture base="/vehicles/optimized/senna/senna-body-macro-v1" className={styles.media} loaded={loaded.experience} />
+            </div>
+            <div className={`${styles.shot} ${styles.sennaWheel}`} data-shot="senna-wheel">
+              <VehiclePicture base="/vehicles/optimized/senna/senna-wheel-macro-v1" className={styles.media} loaded={loaded.experience} />
+            </div>
+            <div className={`${styles.shot} ${styles.sennaExhaust}`} data-shot="senna-exhaust">
+              <VehiclePicture base="/vehicles/optimized/senna/senna-exhaust-macro-v1" className={styles.media} loaded={loaded.experience} />
+            </div>
+            <div className={`${styles.shot} ${styles.sennaHero}`} data-shot="senna-settle">
+              <VehiclePicture base="/vehicles/optimized/senna/senna-hero-closed-v1" className={styles.media} loaded={loaded.experience} />
+            </div>
+            <div className={`${styles.shot} ${styles.sennaHero}`} data-shot="senna-door-sequence">
+              <ScrollFrameSequence
+                ref={doorSequenceRef}
+                className={styles.doorCanvas}
+                desktopFrames={desktopDoorFrames}
+                mobileFrames={mobileDoorFrames}
+                fallbackDesktop="/vehicles/optimized/senna/senna-hero-closed-v1-desktop.webp"
+                fallbackMobile="/vehicles/optimized/senna/senna-hero-closed-v1-mobile.webp"
+                enabled={loaded.experience && !motionReduced}
+                poster="/vehicles/optimized/senna/senna-hero-closed-v1-desktop.webp"
+              />
+            </div>
           </div>
-          <div className={`${styles.shot} ${styles.sennaWheel}`} data-shot="senna-wheel">
-            <VehiclePicture
-              base="/vehicles/optimized/senna/senna-wheel-macro-v1"
-              className={styles.media}
-              loaded={loaded.senna}
-            />
-            <span className={styles.wheelRing} data-wheel-ring />
+          <div className={`${styles.copy} ${styles.copyLeft}`} data-copy="experience-intro">
+            <p className={styles.eyebrow}>02 / Experience</p>
+            <h2 className={styles.chapterTitle}><MaskLine>Work that</MaskLine><MaskLine>holds pressure.</MaskLine></h2>
           </div>
-          <div className={`${styles.shot} ${styles.sennaExhaust}`} data-shot="senna-exhaust">
-            <VehiclePicture
-              base="/vehicles/optimized/senna/senna-exhaust-macro-v1"
-              className={styles.media}
-              loaded={loaded.senna}
-            />
-            <span className={styles.heatLine} data-heat-line />
-          </div>
-          <div className={`${styles.shot} ${styles.sennaHero}`} data-shot="senna-closed">
-            <VehiclePicture
-              base="/vehicles/optimized/senna/senna-hero-closed-v1"
-              className={styles.media}
-              loaded={loaded.senna}
-            />
-          </div>
-          <div className={`${styles.shot} ${styles.sennaHero}`} data-shot="senna-open">
-            <VehiclePicture
-              base="/vehicles/optimized/senna/senna-hero-open-v1"
-              className={styles.media}
-              loaded={loaded.senna}
-            />
-          </div>
-          <div className={styles.doorLight} data-door-light />
-          <div className={`${styles.shot} ${styles.sennaTransition}`} data-shot="senna-transition">
-            <VehiclePicture
-              base="/vehicles/optimized/senna/senna-wheel-macro-v1"
-              className={styles.media}
-              loaded={loaded.senna}
-            />
-          </div>
-
-          <div className={`${styles.copy} ${styles.copyLeft}`} data-copy="senna-intro">
-            <p className={styles.eyebrow}>01 / Experience</p>
-            <h2 className={styles.chapterTitle}>
-              <MaskLine>Systems</MaskLine>
-              <MaskLine>under pressure.</MaskLine>
-            </h2>
-          </div>
-
           {experience.map((item, index) => (
-            <article
-              className={`${styles.copy} ${index === 1 ? styles.copyLeft : styles.copyRight} ${styles.factCopy}`}
-              data-copy={`experience-${index}`}
-              key={item.id}
-            >
-              <p className={styles.eyebrow}>
-                {String(index + 1).padStart(2, "0")} · {item.discipline}
-              </p>
-              <h3 className={styles.factTitle}>
-                <MaskLine>{item.organisation}</MaskLine>
-              </h3>
-              <MaskLine className={styles.factMeta}>
-                {item.role} · {item.period}
-              </MaskLine>
+            <article className={`${styles.copy} ${index === 1 ? styles.copyLeft : styles.copyRight} ${styles.factCopy}`} data-copy={`experience-${index}`} key={item.id}>
+              <p className={styles.eyebrow}>{String(index + 1).padStart(2, "0")} · {item.discipline}</p>
+              <h3 className={styles.factTitle}><MaskLine>{item.organisation}</MaskLine></h3>
+              <MaskLine className={styles.factMeta}>{item.role} · {item.period}{item.status ? ` · ${item.status}` : ""}</MaskLine>
               <MaskLine className={styles.factBody}>{item.summary}</MaskLine>
             </article>
           ))}
-
-          <div className={`${styles.copy} ${styles.copyRight} ${styles.closeCopy}`} data-copy="experience-close">
-            <p className={styles.eyebrow}>Experience / Complete record</p>
-            <h3 className={styles.statementTitle}>
-              <MaskLine>Product.</MaskLine>
-              <MaskLine>Models.</MaskLine>
-              <MaskLine>Infrastructure.</MaskLine>
-            </h3>
-            <MaskLine className={styles.inlineLink} inert>
-              <Link href="/experience">View experience ↗</Link>
-            </MaskLine>
+          <div className={`${styles.copy} ${styles.copyRight} ${styles.factCopy}`} data-copy="experience-close">
+            <p className={styles.eyebrow}>Complete record</p>
+            <h3 className={styles.factTitle}><MaskLine>Product.</MaskLine><MaskLine>Models. Systems.</MaskLine></h3>
           </div>
         </div>
 
-        <div className={styles.scene} data-scene="f1">
-          <div className={`${styles.shot} ${styles.f1Hero}`} data-shot="f1-hero">
-            <VehiclePicture
-              base="/vehicles/optimized/f1/f1-hero-v1"
-              className={styles.media}
-              loaded={loaded.f1}
-            />
+        <div className={styles.scene} data-scene="projects">
+          <div className={styles.camera} data-camera="ferrari">
+            {[
+              ["ferrari-tyre", "tyre-macro-v1"],
+              ["ferrari-controls", "steering-cockpit-v1"],
+              ["ferrari-suspension", "suspension-macro-v1"],
+              ["ferrari-hero", "front-hero-v1"],
+              ["ferrari-speed", "side-speed-v1"],
+              ["ferrari-rear", "rear-light-v1"],
+            ].map(([shot, asset]) => (
+              <div className={`${styles.shot} ${styles.ferrariShot}`} data-shot={shot} key={shot}>
+                <VehiclePicture base={`/vehicles/optimized/f1/ferrari/${asset}`} className={styles.media} loaded={loaded.projects} />
+              </div>
+            ))}
           </div>
-          <div className={`${styles.shot} ${styles.f1Cockpit}`} data-shot="f1-cockpit">
-            <VehiclePicture
-              base="/vehicles/optimized/f1/f1-cockpit-v1"
-              className={styles.media}
-              loaded={loaded.f1}
-            />
+          <div className={styles.telemetryUi}>
+            <span data-telemetry-ring /><span data-telemetry-ring /><i />
           </div>
-          <div className={`${styles.shot} ${styles.f1HeroReturn}`} data-shot="f1-hero-return">
-            <VehiclePicture
-              base="/vehicles/optimized/f1/f1-hero-v1"
-              className={styles.media}
-              loaded={loaded.f1}
-            />
+          <div className={`${styles.copy} ${styles.copyLeft}`} data-copy="projects-intro">
+            <p className={styles.eyebrow}>03 / Projects · engineering in motion</p>
+            <h2 className={styles.chapterTitle}><MaskLine>Decisions at</MaskLine><MaskLine>race speed.</MaskLine></h2>
           </div>
-          <span className={styles.f1Speedline} data-f1-speedline />
-          <span className={styles.redOrb} data-red-orb />
-
-          <div className={`${styles.copy} ${styles.copyLeft}`} data-copy="f1-intro">
-            <p className={styles.eyebrow}>02 / Projects</p>
-            <h2 className={styles.chapterTitle}>
-              <MaskLine>Decisions at</MaskLine>
-              <MaskLine>race speed.</MaskLine>
-            </h2>
-          </div>
-
-          {projects.map((project, index) => (
-            <article
-              className={`${styles.copy} ${index % 2 ? styles.copyLeft : styles.copyRight} ${styles.factCopy}`}
-              data-copy={`project-${index}`}
-              key={project.slug}
-            >
-              <p className={styles.eyebrow}>
-                {project.index} · {project.category}
-              </p>
-              <h3 className={styles.factTitle}>
-                <MaskLine>{project.title}</MaskLine>
-              </h3>
-              <MaskLine className={styles.factMeta}>
-                {project.period}{project.status ? ` · ${project.status}` : ""}
-              </MaskLine>
+          {featuredProjects.slice(0, 2).map((project, index) => (
+            <article className={`${styles.copy} ${index ? styles.copyLeft : styles.copyRight} ${styles.factCopy}`} data-copy={`project-${index}`} key={project.slug}>
+              <p className={styles.eyebrow}>{project.index} · {project.category}</p>
+              <h3 className={styles.factTitle}><MaskLine>{project.title}</MaskLine></h3>
+              <MaskLine className={styles.factMeta}>{project.period}{project.status ? ` · ${project.status}` : ""}</MaskLine>
               <MaskLine className={styles.factBody}>{project.summary}</MaskLine>
-              <MaskLine className={styles.inlineLink} inert>
-                <Link href={`/projects/${project.slug}`}>Open case study ↗</Link>
-              </MaskLine>
             </article>
           ))}
-        </div>
-
-        <div className={styles.scene} data-scene="skyline">
-          <div
-            className={styles.skylineScanner}
-            onPointerMove={moveScanner}
-            onPointerLeave={(event) => {
-              if (scanLocked) return;
-              event.currentTarget.style.setProperty("--scan-x", "67%");
-              event.currentTarget.style.setProperty("--scan-y", "46%");
-            }}
-          >
-            <div className={`${styles.shot} ${styles.skylineHero}`} data-shot="skyline-closed">
-              <VehiclePicture
-                base="/vehicles/optimized/skyline/skyline-hero-closed-v1"
-                className={styles.media}
-                loaded={loaded.skyline}
-              />
-            </div>
-            <div className={`${styles.shot} ${styles.skylineXray}`} data-shot="skyline-xray">
-              <VehiclePicture
-                base="/vehicles/optimized/skyline/skyline-hero-xray-v1"
-                className={styles.media}
-                loaded={loaded.skyline}
-              />
-            </div>
-          </div>
-          <div className={styles.tailRings} aria-hidden="true">
-            <span data-tail-ring />
-            <span data-tail-ring />
-            <span data-tail-ring />
-            <span data-tail-ring />
-          </div>
-          <button
-            className={styles.scanToggle}
-            type="button"
-            tabIndex={-1}
-            aria-pressed={scanLocked}
-            onClick={() => setScanLocked((current) => !current)}
-          >
-            {scanLocked ? "Close hood scan" : "Hold hood scan"}
-          </button>
-
-          <div className={`${styles.copy} ${styles.copyLeft}`} data-copy="skyline-intro">
-            <p className={styles.eyebrow}>03 / About</p>
-            <h2 className={styles.chapterTitle}>
-              <MaskLine>Look beneath</MaskLine>
-              <MaskLine>the surface.</MaskLine>
-            </h2>
-          </div>
-          <div className={`${styles.copy} ${styles.copyRight} ${styles.factCopy}`} data-copy="about-primary">
-            <p className={styles.eyebrow}>Aayu Pratap Singh</p>
-            <h3 className={styles.factTitle}>
-              <MaskLine>Computer science</MaskLine>
-              <MaskLine>at Waterloo.</MaskLine>
-            </h3>
-            <MaskLine className={styles.factBody}>
-              Product engineering, machine learning, infrastructure, simulation, and visual storytelling.
-            </MaskLine>
-          </div>
-          <div className={`${styles.copy} ${styles.copyLeft} ${styles.factCopy}`} data-copy="about-scan">
-            <p className={styles.eyebrow}>Registered diagnostic layer</p>
-            <h3 className={styles.factTitle}>
-              <MaskLine>Motorsport.</MaskLine>
-              <MaskLine>Football. Film.</MaskLine>
-            </h3>
-            <MaskLine className={styles.factBody}>
-              Move across the hood to reveal the system beneath it.
-            </MaskLine>
-            <MaskLine className={styles.inlineLink} inert>
-              <Link href="/about">Read about Aayu ↗</Link>
-            </MaskLine>
+          <div className={`${styles.copy} ${styles.copyRight} ${styles.factCopy}`} data-copy="projects-index">
+            <p className={styles.eyebrow}>Five factual case studies / no invented outcomes</p>
+            <h3 className={styles.factTitle}><MaskLine>Products.</MaskLine><MaskLine>Models. Motion.</MaskLine></h3>
+            <MaskLine className={styles.factBody}>{featuredProjects[2].title}, AI Personal Finance Manager, and Emotion-Powered Music Mixer continue in the project index.</MaskLine>
           </div>
         </div>
 
         <div className={styles.scene} data-scene="creative">
           <div className={styles.aperture} data-aperture>
-            <div className={styles.apertureBlades} data-aperture-blades>
-              {Array.from({ length: 8 }, (_, index) => (
-                <span key={index} style={{ "--blade": index } as React.CSSProperties} />
-              ))}
-            </div>
             <div className={styles.apertureImage}>
-              <VehiclePicture
-                base="/vehicles/optimized/senna/senna-exhaust-macro-v1"
-                className={styles.media}
-                loaded={loaded.creative}
-              />
+              <VehiclePicture base="/vehicles/optimized/f1/ferrari/rear-light-v1" className={styles.media} loaded={loaded.creative} />
+            </div>
+            <div className={styles.apertureBlades} data-aperture-blades>
+              {Array.from({ length: 10 }, (_, index) => <span key={index} style={{ "--blade": index } as React.CSSProperties} />)}
             </div>
           </div>
           <div className={`${styles.copy} ${styles.copyLeft}`} data-copy="creative-intro">
             <p className={styles.eyebrow}>04 / Creative practice</p>
-            <h2 className={styles.chapterTitle}>
-              <MaskLine>Frames with</MaskLine>
-              <MaskLine>intent.</MaskLine>
-            </h2>
+            <h2 className={styles.chapterTitle}><MaskLine>Images with</MaskLine><MaskLine>intent.</MaskLine></h2>
           </div>
           <div className={`${styles.copy} ${styles.copyRight} ${styles.factCopy}`} data-copy="creative-vfx">
-            <p className={styles.eyebrow}>VFX / Motion</p>
-            <h3 className={styles.factTitle}>
-              <MaskLine>Compositing.</MaskLine>
-              <MaskLine>Light. Timing.</MaskLine>
-            </h3>
-            <MaskLine className={styles.factBody}>
-              A dedicated home for finished VFX work and process breakdowns. Final media pending.
-            </MaskLine>
+            <p className={styles.eyebrow}>VFX / motion</p>
+            <h3 className={styles.factTitle}><MaskLine>Light.</MaskLine><MaskLine>Timing. Texture.</MaskLine></h3>
+            <MaskLine className={styles.factBody}>A dedicated home for finished VFX work and process breakdowns. Final media pending.</MaskLine>
           </div>
           <div className={`${styles.copy} ${styles.copyLeft} ${styles.factCopy}`} data-copy="creative-photo">
             <p className={styles.eyebrow}>Photography</p>
-            <h3 className={styles.factTitle}>
-              <MaskLine>Observation</MaskLine>
-              <MaskLine>over spectacle.</MaskLine>
-            </h3>
-            <MaskLine className={styles.factBody}>
-              The archive remains explicitly placeholder-only until Aayu supplies the final work.
-            </MaskLine>
-            <MaskLine className={styles.inlineLink} inert>
-              <Link href="/archive">Enter the archive ↗</Link>
-            </MaskLine>
+            <h3 className={styles.factTitle}><MaskLine>Observation</MaskLine><MaskLine>over spectacle.</MaskLine></h3>
+            <MaskLine className={styles.factBody}>The archive remains honestly placeholder-only until Aayu supplies the final work.</MaskLine>
           </div>
         </div>
 
@@ -944,137 +830,52 @@ export function AutomotiveHome() {
           <span className={styles.contactRule} data-contact-rule />
           <div className={`${styles.copy} ${styles.contactCopy}`} data-copy="contact">
             <p className={styles.eyebrow}>05 / Contact</p>
-            <h2 className={styles.contactTitle}>
-              <MaskLine>Let’s build</MaskLine>
-              <MaskLine>what moves next.</MaskLine>
-            </h2>
-            <MaskLine className={styles.contactEmail} inert>
-              <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
-            </MaskLine>
-            <MaskLine className={styles.contactLinks} inert>
-              <a href={siteConfig.github} target="_blank" rel="noreferrer">GitHub ↗</a>
-              <Link href="/resume">Résumé ↗</Link>
-            </MaskLine>
+            <h2 className={styles.contactTitle}><MaskLine>Let’s build</MaskLine><MaskLine>what moves next.</MaskLine></h2>
+            <MaskLine className={styles.contactEmail} inert><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></MaskLine>
           </div>
         </div>
 
-        <div className={styles.stageFinish} aria-hidden="true" />
-        <div className={styles.grain} aria-hidden="true" />
-        <div className={styles.vignette} aria-hidden="true" />
-        <div className={styles.hud} aria-hidden="true">
-          <span>APS / 2026</span>
-          <span className={styles.hudChapter}>Automotive study</span>
+        <div className={styles.vignette} />
+        <div className={styles.hud}>
+          <span>APS / portfolio</span>
+          <span className={styles.hudChapter}>About first / vehicles as visual language</span>
           <i />
         </div>
-
       </div>
+
+      <nav className={styles.actionDock} aria-label="Portfolio shortcuts">
+        <Link href="/about" data-action-chapter="about">Profile <span>↗</span></Link>
+        <Link href="/experience" data-action-chapter="experience">Full record <span>↗</span></Link>
+        <Link href="/projects" data-action-chapter="projects">Case studies <span>↗</span></Link>
+        <Link href="/archive" data-action-chapter="creative">Creative archive <span>↗</span></Link>
+        <a href={`mailto:${siteConfig.email}`} data-action-chapter="contact">Start a conversation <span>↗</span></a>
+        <a href={siteConfig.github} target="_blank" rel="noreferrer" data-action-chapter="contact">GitHub <span>↗</span></a>
+        <Link href="/resume" data-action-chapter="contact">Résumé <span>↗</span></Link>
+      </nav>
 
       <nav className={styles.chapterRail} aria-label="Homepage chapters">
         {chapterLinks.map((chapter, index) => (
-          <a
-            href={chapter.href}
-            data-chapter-link={chapter.id}
-            data-active={index === 0 ? "" : undefined}
-            aria-current={index === 0 ? "true" : undefined}
-            key={chapter.id}
-          >
-            <span>{chapter.label}</span>
-            <i aria-hidden="true">{String(index).padStart(2, "0")}</i>
+          <a href={chapter.href} aria-label={`Jump to ${chapter.label}`} data-chapter-link={chapter.id} data-active={index === 0 ? "" : undefined} aria-current={index === 0 ? "location" : undefined} key={chapter.id}>
+            <span>{chapter.label}</span><i aria-hidden="true">{String(index + 1).padStart(2, "0")}</i>
           </a>
         ))}
       </nav>
 
       <div className={styles.scrollTrack}>
-        <section id="opening" className={styles.trackOpening} aria-label="Introduction">
-          <ReducedChapter
-            eyebrow="Aayu Pratap Singh · Waterloo, Ontario"
-            title="Engineering in motion."
-            body="Computer Science at the University of Waterloo. Product, machine learning, infrastructure, simulation, and visual storytelling."
-            image="/vehicles/optimized/senna/senna-body-macro-v1"
-            imageAlt="Orange performance car body detail in a dark studio."
-            headingLevel={1}
-            linksEnabled={motionReduced}
-          />
+        <section id="about" className={styles.trackAbout} aria-label="About">
+          <ReducedChapter eyebrow="01 / About" title={`${siteConfig.name} — ${siteConfig.title}`} body={siteConfig.description} image="/vehicles/optimized/skyline/v2/skyline-hero-rear-three-quarter-v2" imageAlt="Cobalt performance coupe in a dark studio." headingLevel={1} linksEnabled={motionReduced}><Link href="/about">About Aayu ↗</Link></ReducedChapter>
         </section>
-        <section
-          id="experience"
-          className={styles.trackSenna}
-          aria-label="Experience"
-          data-load-chapter="senna"
-        >
-          <ReducedChapter
-            eyebrow="01 / Experience"
-            title="Systems under pressure."
-            body="UniMarket, WAT.AI SportsNext, and ATS Corporation—product ownership, learning match dynamics, and reliable infrastructure."
-            image="/vehicles/optimized/senna/senna-hero-open-v1"
-            imageAlt="Orange performance car with dihedral doors raised in a dark studio."
-            align="right"
-            linksEnabled={motionReduced}
-          >
-            <Link href="/experience">View complete experience ↗</Link>
-          </ReducedChapter>
+        <section id="experience" className={styles.trackExperience} aria-label="Experience" data-load-chapter="experience">
+          <ReducedChapter eyebrow="02 / Experience" title="Work that holds pressure." body="UniMarket, WAT.AI SportsNext, and ATS Corporation—product ownership, machine learning, and reliable infrastructure." image="/vehicles/optimized/senna/senna-hero-open-v1" imageAlt="Orange performance car with raised dihedral doors." align="right" linksEnabled={motionReduced}><Link href="/experience">View experience ↗</Link></ReducedChapter>
         </section>
-        <section
-          id="projects"
-          className={styles.trackF1}
-          aria-label="Projects"
-          data-load-chapter="f1"
-        >
-          <ReducedChapter
-            eyebrow="02 / Projects"
-            title="Decisions at race speed."
-            body="Five projects across telemetry, simulation, full-stack product engineering, machine learning, RAG, and real-time creative technology."
-            image="/vehicles/optimized/f1/f1-hero-v1"
-            imageAlt="Unbranded open-wheel race car in a dark studio."
-            linksEnabled={motionReduced}
-          >
-            <Link href="/projects">Explore all projects ↗</Link>
-          </ReducedChapter>
+        <section id="projects" className={styles.trackProjects} aria-label="Projects" data-load-chapter="projects">
+          <ReducedChapter eyebrow="03 / Projects" title="Decisions at race speed." body="Five projects across telemetry, simulation, product engineering, machine learning, RAG, and creative technology." image="/vehicles/optimized/f1/ferrari/front-hero-v1" imageAlt="Original scarlet open-wheel race car in a dark studio." linksEnabled={motionReduced}><Link href="/projects">Explore projects ↗</Link></ReducedChapter>
         </section>
-        <section
-          id="about"
-          className={styles.trackSkyline}
-          aria-label="About"
-          data-load-chapter="skyline"
-        >
-          <ReducedChapter
-            eyebrow="03 / About"
-            title="Look beneath the surface."
-            body="Aayu studies Computer Science at Waterloo and works across software, ML, systems, sport, and image."
-            image="/vehicles/optimized/skyline/skyline-hero-xray-v1"
-            imageAlt="Blue Japanese performance car with a diagnostic view through the hood."
-            align="right"
-            linksEnabled={motionReduced}
-          >
-            <Link href="/about">About Aayu ↗</Link>
-          </ReducedChapter>
-        </section>
-        <section
-          id="creative"
-          className={styles.trackCreative}
-          aria-label="Creative work"
-          data-load-chapter="creative"
-        >
-          <ReducedChapter
-            eyebrow="04 / Creative practice"
-            title="Frames with intent."
-            body="A future home for Aayu’s VFX, motion work, photography, and process. All current archive media is clearly marked as placeholder."
-            image="/vehicles/optimized/senna/senna-exhaust-macro-v1"
-            imageAlt="Mechanical exhaust detail lit in a dark studio."
-            linksEnabled={motionReduced}
-          >
-            <Link href="/archive">Enter the archive ↗</Link>
-          </ReducedChapter>
+        <section id="creative" className={styles.trackCreative} aria-label="Creative work" data-load-chapter="creative">
+          <ReducedChapter eyebrow="04 / Creative practice" title="Images with intent." body="A future home for Aayu’s VFX, motion work, photography, and process." image="/vehicles/optimized/f1/ferrari/rear-light-v1" imageAlt="Scarlet race car rear light in a dark tunnel." align="right" linksEnabled={motionReduced}><Link href="/archive">Enter archive ↗</Link></ReducedChapter>
         </section>
         <section id="contact" className={styles.trackContact} aria-label="Contact">
-          <ReducedChapter
-            eyebrow="05 / Contact"
-            title="Let’s build what moves next."
-            body={`${siteConfig.name} · ${siteConfig.location}`}
-            linksEnabled={motionReduced}
-          >
-            <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
-          </ReducedChapter>
+          <ReducedChapter eyebrow="05 / Contact" title="Let’s build what moves next." body={`${siteConfig.name} · ${siteConfig.location}`} linksEnabled={motionReduced}><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a> · <a href={siteConfig.github}>GitHub</a> · <Link href="/resume">Résumé</Link></ReducedChapter>
         </section>
       </div>
     </main>

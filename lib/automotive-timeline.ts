@@ -1,38 +1,32 @@
 export type AutomotiveChapterId =
-  | "opening"
-  | "senna"
-  | "f1"
-  | "skyline"
+  | "about"
+  | "experience"
+  | "projects"
   | "creative"
   | "contact";
 
-export type SennaShotId =
-  | "body"
-  | "wheel"
-  | "exhaust"
-  | "hero"
-  | "doors"
-  | "transition";
-
 export type AutomotiveShotId =
-  | "darkness"
   | "identity"
-  | "senna-handoff"
-  | SennaShotId
-  | "tyre-match"
-  | "steering"
-  | "suspension"
-  | "cockpit"
-  | "f1-hero"
-  | "rear-light"
-  | "taillights"
-  | "headlight"
   | "skyline-hero"
-  | "xray"
-  | "lens-transition"
+  | "engine-closed"
+  | "engine-reveal"
+  | "engine-model"
+  | "skyline-handoff"
+  | "senna-carbon"
+  | "senna-wheel"
+  | "senna-exhaust"
+  | "senna-settle"
+  | "senna-doors"
+  | "senna-open"
+  | "tyre-match"
+  | "ferrari-controls"
+  | "ferrari-suspension"
+  | "ferrari-hero"
+  | "ferrari-speed"
+  | "ferrari-rear"
   | "aperture"
-  | "showreel"
-  | "writing"
+  | "vfx"
+  | "photography"
   | "iris-close"
   | "end-frame";
 
@@ -43,55 +37,67 @@ type TimelineSegment<Id extends string> = Readonly<{
 }>;
 
 /**
- * The homepage's normalized edit. Segments are half-open (`start <= p < end`),
- * except for the final segment, which includes progress 1. Exact boundaries
- * therefore resolve to the incoming chapter or shot.
+ * Canonical positions in the authored GSAP edit. Components convert these
+ * units to normalized scroll progress; public chapter state uses the same
+ * boundaries so the DOM contract can never drift from the film.
+ */
+export const AUTOMOTIVE_EDIT = Object.freeze({
+  total: 285,
+  aboutEnd: 56,
+  experienceEnd: 136,
+  projectsEnd: 224,
+  creativeEnd: 266,
+  engineModelStart: 44.5,
+  engineModelEnd: 54.8,
+  doorStart: 110,
+  doorEnd: 126,
+});
+
+/**
+ * A single normalized edit table drives both visible choreography and public
+ * timeline state. Segments are half-open; exact boundaries resolve forward.
  */
 export const AUTOMOTIVE_CHAPTERS: readonly TimelineSegment<AutomotiveChapterId>[] = [
-  { id: "opening", start: 0, end: 0.1 },
-  { id: "senna", start: 0.1, end: 0.38 },
-  { id: "f1", start: 0.38, end: 0.62 },
-  { id: "skyline", start: 0.62, end: 0.8 },
-  { id: "creative", start: 0.8, end: 0.94 },
-  { id: "contact", start: 0.94, end: 1 },
+  { id: "about", start: 0, end: AUTOMOTIVE_EDIT.aboutEnd / AUTOMOTIVE_EDIT.total },
+  { id: "experience", start: AUTOMOTIVE_EDIT.aboutEnd / AUTOMOTIVE_EDIT.total, end: AUTOMOTIVE_EDIT.experienceEnd / AUTOMOTIVE_EDIT.total },
+  { id: "projects", start: AUTOMOTIVE_EDIT.experienceEnd / AUTOMOTIVE_EDIT.total, end: AUTOMOTIVE_EDIT.projectsEnd / AUTOMOTIVE_EDIT.total },
+  { id: "creative", start: AUTOMOTIVE_EDIT.projectsEnd / AUTOMOTIVE_EDIT.total, end: AUTOMOTIVE_EDIT.creativeEnd / AUTOMOTIVE_EDIT.total },
+  { id: "contact", start: AUTOMOTIVE_EDIT.creativeEnd / AUTOMOTIVE_EDIT.total, end: 1 },
 ] as const;
 
 export const AUTOMOTIVE_SHOTS: Readonly<
   Record<AutomotiveChapterId, readonly TimelineSegment<AutomotiveShotId>[]>
 > = {
-  opening: [
-    { id: "darkness", start: 0, end: 0.34 },
-    { id: "identity", start: 0.34, end: 0.72 },
-    { id: "senna-handoff", start: 0.72, end: 1 },
+  about: [
+    { id: "identity", start: 0, end: 0.25 },
+    { id: "skyline-hero", start: 0.25, end: 0.5214 },
+    { id: "engine-closed", start: 0.5214, end: 0.625 },
+    { id: "engine-reveal", start: 0.625, end: 0.7946 },
+    { id: "engine-model", start: 0.7946, end: 0.9786 },
+    { id: "skyline-handoff", start: 0.9786, end: 1 },
   ],
-  senna: [
-    { id: "body", start: 0, end: 0.18 },
-    { id: "wheel", start: 0.18, end: 0.36 },
-    { id: "exhaust", start: 0.36, end: 0.52 },
-    { id: "hero", start: 0.52, end: 0.7 },
-    { id: "doors", start: 0.7, end: 0.9 },
-    { id: "transition", start: 0.9, end: 1 },
+  experience: [
+    { id: "senna-carbon", start: 0, end: 0.15 },
+    { id: "senna-wheel", start: 0.15, end: 0.3563 },
+    { id: "senna-exhaust", start: 0.3563, end: 0.5625 },
+    { id: "senna-settle", start: 0.5625, end: 0.675 },
+    { id: "senna-doors", start: 0.675, end: 0.875 },
+    { id: "senna-open", start: 0.875, end: 0.925 },
+    { id: "tyre-match", start: 0.925, end: 1 },
   ],
-  f1: [
-    { id: "tyre-match", start: 0, end: 0.17 },
-    { id: "steering", start: 0.17, end: 0.34 },
-    { id: "suspension", start: 0.34, end: 0.5 },
-    { id: "cockpit", start: 0.5, end: 0.67 },
-    { id: "f1-hero", start: 0.67, end: 0.86 },
-    { id: "rear-light", start: 0.86, end: 1 },
-  ],
-  skyline: [
-    { id: "taillights", start: 0, end: 0.2 },
-    { id: "headlight", start: 0.2, end: 0.38 },
-    { id: "skyline-hero", start: 0.38, end: 0.6 },
-    { id: "xray", start: 0.6, end: 0.88 },
-    { id: "lens-transition", start: 0.88, end: 1 },
+  projects: [
+    { id: "tyre-match", start: 0, end: 0.1193 },
+    { id: "ferrari-controls", start: 0.1193, end: 0.3182 },
+    { id: "ferrari-suspension", start: 0.3182, end: 0.517 },
+    { id: "ferrari-hero", start: 0.517, end: 0.7159 },
+    { id: "ferrari-speed", start: 0.7159, end: 0.8409 },
+    { id: "ferrari-rear", start: 0.8409, end: 1 },
   ],
   creative: [
-    { id: "aperture", start: 0, end: 0.2 },
-    { id: "showreel", start: 0.2, end: 0.56 },
-    { id: "writing", start: 0.56, end: 0.84 },
-    { id: "iris-close", start: 0.84, end: 1 },
+    { id: "aperture", start: 0, end: 0.119 },
+    { id: "vfx", start: 0.119, end: 0.655 },
+    { id: "photography", start: 0.655, end: 0.952 },
+    { id: "iris-close", start: 0.952, end: 1 },
   ],
   contact: [{ id: "end-frame", start: 0, end: 1 }],
 } as const;
@@ -106,31 +112,17 @@ export type AutomotiveTimelineState = Readonly<{
   shotProgress: number;
 }>;
 
-/** Clamp an arbitrary input into the normalized timeline domain. */
 export function clampTimelineProgress(progress: number): number {
-  if (Number.isNaN(progress) || progress === Number.NEGATIVE_INFINITY) {
-    return 0;
-  }
-
-  if (progress === Number.POSITIVE_INFINITY) {
-    return 1;
-  }
-
+  if (Number.isNaN(progress) || progress === Number.NEGATIVE_INFINITY) return 0;
+  if (progress === Number.POSITIVE_INFINITY) return 1;
   return Math.min(1, Math.max(0, progress));
 }
 
-/** Resolve normalized progress within a segment, clamped at both ends. */
-export function getLocalProgress(
-  progress: number,
-  start: number,
-  end: number,
-): number {
+export function getLocalProgress(progress: number, start: number, end: number): number {
   if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) {
     throw new RangeError("Timeline segment end must be greater than start");
   }
-
-  const clampedProgress = clampTimelineProgress(progress);
-  return Math.min(1, Math.max(0, (clampedProgress - start) / (end - start)));
+  return Math.min(1, Math.max(0, (clampTimelineProgress(progress) - start) / (end - start)));
 }
 
 function resolveSegment<Id extends string>(
@@ -140,11 +132,9 @@ function resolveSegment<Id extends string>(
   const clampedProgress = clampTimelineProgress(progress);
   const lastIndex = segments.length - 1;
   const index = segments.findIndex(
-    (segment, segmentIndex) =>
-      clampedProgress < segment.end || segmentIndex === lastIndex,
+    (segment, segmentIndex) => clampedProgress < segment.end || segmentIndex === lastIndex,
   );
   const segment = segments[index];
-
   return {
     id: segment.id,
     index,
@@ -152,7 +142,6 @@ function resolveSegment<Id extends string>(
   } as const;
 }
 
-/** Resolve a local chapter position to one of that chapter's authored shots. */
 export function resolveChapterShot(
   chapterId: AutomotiveChapterId,
   chapterProgress: number,
@@ -160,17 +149,10 @@ export function resolveChapterShot(
   return resolveSegment(chapterProgress, AUTOMOTIVE_SHOTS[chapterId]);
 }
 
-/**
- * Resolve a scroll position without reading or retaining prior direction/state.
- * The same progress always produces the same chapter, shot, and local values.
- */
-export function resolveAutomotiveTimeline(
-  progress: number,
-): AutomotiveTimelineState {
+export function resolveAutomotiveTimeline(progress: number): AutomotiveTimelineState {
   const clampedProgress = clampTimelineProgress(progress);
   const chapter = resolveSegment(clampedProgress, AUTOMOTIVE_CHAPTERS);
   const shot = resolveChapterShot(chapter.id, chapter.progress);
-
   return {
     progress: clampedProgress,
     chapterId: chapter.id,

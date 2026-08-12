@@ -13,16 +13,144 @@ const VEHICLE_ROOT = path.join(PUBLIC_ROOT, "vehicles");
 const OUTPUT_ROOT = path.join(VEHICLE_ROOT, "optimized");
 const MANIFEST_PATH = path.join(OUTPUT_ROOT, "manifest.json");
 
-const SOURCE_GROUPS = Object.freeze(["senna", "f1", "skyline"]);
-const WEBP_OPTIONS = Object.freeze({
-  quality: 86,
-  effort: 6,
-  smartSubsample: true,
-  preset: "photo",
+const SOURCE_GROUPS = Object.freeze(["senna", "f1", "skyline", "effects"]);
+const SEQUENCE_FRAME_COUNT = 10;
+const OUTPUT_PROFILES = Object.freeze({
+  plate: Object.freeze({
+    grayscale: false,
+    sharpen: Object.freeze({
+      sigma: 0.55,
+      m1: 0.7,
+      m2: 1.35,
+      x1: 2,
+      y2: 8,
+      y3: 16,
+    }),
+    webp: Object.freeze({
+      quality: 86,
+      effort: 6,
+      smartSubsample: true,
+      preset: "photo",
+    }),
+    variants: Object.freeze({
+      desktop: Object.freeze({ longEdge: 2560, withoutEnlargement: false }),
+      mobile: Object.freeze({ longEdge: 1440, withoutEnlargement: false }),
+    }),
+  }),
+  sequenceFrame: Object.freeze({
+    grayscale: false,
+    sharpen: Object.freeze({
+      sigma: 0.4,
+      m1: 0.55,
+      m2: 1.1,
+      x1: 2,
+      y2: 8,
+      y3: 16,
+    }),
+    webp: Object.freeze({
+      quality: 80,
+      effort: 6,
+      smartSubsample: true,
+      preset: "photo",
+    }),
+    variants: Object.freeze({
+      desktop: Object.freeze({ longEdge: 1920, withoutEnlargement: false }),
+      mobile: Object.freeze({ longEdge: 1280, withoutEnlargement: false }),
+    }),
+  }),
+  effect: Object.freeze({
+    grayscale: true,
+    sharpen: null,
+    webp: Object.freeze({
+      quality: 88,
+      effort: 6,
+      smartSubsample: false,
+      preset: "picture",
+    }),
+    variants: Object.freeze({
+      desktop: Object.freeze({ longEdge: 1440, withoutEnlargement: true }),
+      mobile: Object.freeze({ longEdge: 1024, withoutEnlargement: true }),
+    }),
+  }),
 });
-const OUTPUT_VARIANTS = Object.freeze({
-  desktop: Object.freeze({ longEdge: 3840 }),
-  mobile: Object.freeze({ longEdge: 2160 }),
+
+const ASSET_ROLES = Object.freeze({
+  "senna/senna-body-macro-v1.png": Object.freeze({
+    role: "opening-body-macro",
+    preloadRole: "critical",
+  }),
+  "senna/senna-wheel-macro-v1.png": Object.freeze({
+    role: "senna-wheel",
+    preloadRole: "chapter-entry",
+  }),
+  "senna/senna-exhaust-macro-v1.png": Object.freeze({
+    role: "senna-exhaust",
+    preloadRole: "near-shot",
+  }),
+  "senna/senna-hero-closed-v1.png": Object.freeze({
+    role: "senna-hero-closed",
+    preloadRole: "near-shot",
+  }),
+  "senna/senna-hero-open-v1.png": Object.freeze({
+    role: "senna-hero-open-fallback",
+    preloadRole: "on-demand",
+  }),
+  "f1/ferrari/tyre-macro-v1.png": Object.freeze({
+    role: "f1-tyre-match",
+    preloadRole: "chapter-entry",
+  }),
+  "f1/ferrari/steering-cockpit-v1.png": Object.freeze({
+    role: "f1-steering-cockpit",
+    preloadRole: "near-shot",
+  }),
+  "f1/ferrari/suspension-macro-v1.png": Object.freeze({
+    role: "f1-suspension",
+    preloadRole: "near-shot",
+  }),
+  "f1/ferrari/front-hero-v1.png": Object.freeze({
+    role: "f1-front-hero",
+    preloadRole: "near-shot",
+  }),
+  "f1/ferrari/side-speed-v1.png": Object.freeze({
+    role: "f1-side-speed",
+    preloadRole: "near-shot",
+  }),
+  "f1/ferrari/rear-light-v1.png": Object.freeze({
+    role: "f1-rear-light-handoff",
+    preloadRole: "near-shot",
+  }),
+  "skyline/v2/skyline-taillight-macro-v2.png": Object.freeze({
+    role: "skyline-taillight-match",
+    preloadRole: "chapter-entry",
+  }),
+  "skyline/v2/skyline-hero-rear-three-quarter-v2.png": Object.freeze({
+    role: "skyline-intro-hero",
+    preloadRole: "chapter-entry",
+  }),
+  "skyline/v2/skyline-headlight-macro-v2.png": Object.freeze({
+    role: "skyline-headlight",
+    preloadRole: "near-shot",
+  }),
+  "skyline/v2/skyline-engine-front-closed-reg-v2.png": Object.freeze({
+    role: "skyline-engine-closed",
+    preloadRole: "near-shot",
+  }),
+  "skyline/v2/skyline-engine-front-open-reg-v2.png": Object.freeze({
+    role: "skyline-engine-open",
+    preloadRole: "paired-reveal",
+  }),
+  "skyline/v2/skyline-side-profile-v2.png": Object.freeze({
+    role: "skyline-side-profile",
+    preloadRole: "near-shot",
+  }),
+  "effects/skyline-engine-ink-mask-v1.png": Object.freeze({
+    role: "skyline-engine-reveal-mask",
+    preloadRole: "paired-reveal",
+  }),
+  "effects/skyline-engine-depth-v1.png": Object.freeze({
+    role: "skyline-engine-depth-map",
+    preloadRole: "paired-reveal",
+  }),
 });
 
 // Add an entry only when a particular mobile asset needs a deliberate crop.
@@ -78,15 +206,67 @@ async function discoverPngs(directory) {
   return files;
 }
 
-function resizeOptions(width, height, longEdge) {
+function resizeOptions(width, height, variantSettings) {
+  const { longEdge, withoutEnlargement } = variantSettings;
   const landscapeOrSquare = width >= height;
   return {
     width: landscapeOrSquare ? longEdge : undefined,
     height: landscapeOrSquare ? undefined : longEdge,
     fit: "inside",
-    withoutEnlargement: false,
+    withoutEnlargement,
     kernel: sharp.kernel.lanczos3,
   };
+}
+
+function expectedLongEdge(width, height, variantSettings) {
+  const sourceLongEdge = Math.max(width, height);
+  return variantSettings.withoutEnlargement
+    ? Math.min(variantSettings.longEdge, sourceLongEdge)
+    : variantSettings.longEdge;
+}
+
+function sequenceMetadata(relativeSource) {
+  const match = /^senna\/door-open-v2\/door-(\d{3})\.png$/i.exec(relativeSource);
+  if (!match) return null;
+
+  const frameIndex = Number(match[1]);
+  if (frameIndex < 0 || frameIndex >= SEQUENCE_FRAME_COUNT) {
+    throw new Error(`Unexpected Senna door sequence frame: ${relativeSource}`);
+  }
+
+  return {
+    id: "senna-door-open-v2",
+    frameIndex,
+    frameCount: SEQUENCE_FRAME_COUNT,
+    progress: frameIndex / (SEQUENCE_FRAME_COUNT - 1),
+  };
+}
+
+function assetDescriptor(relativeSource) {
+  const sequence = sequenceMetadata(relativeSource);
+  if (sequence) {
+    return {
+      profile: "sequenceFrame",
+      role: "senna-door-open-frame",
+      preloadRole: frameIndexPreloadRole(sequence.frameIndex),
+      sequence,
+    };
+  }
+
+  return {
+    profile: relativeSource.startsWith("effects/") ? "effect" : "plate",
+    role: ASSET_ROLES[relativeSource]?.role ?? "supporting-plate",
+    preloadRole: ASSET_ROLES[relativeSource]?.preloadRole ?? "on-demand",
+    sequence: null,
+  };
+}
+
+function frameIndexPreloadRole(frameIndex) {
+  if (frameIndex === 0 || frameIndex === SEQUENCE_FRAME_COUNT - 1) {
+    return "sequence-poster";
+  }
+  if (frameIndex <= 2) return "sequence-seed";
+  return "sequence-neighbor";
 }
 
 function validateArtDirection(relativeSource, metadata, variant) {
@@ -117,8 +297,15 @@ async function sha256(filePath) {
   return createHash("sha256").update(contents).digest("hex");
 }
 
-async function renderVariant({ sourcePath, relativeSource, sourceMetadata, variant }) {
-  const { longEdge } = OUTPUT_VARIANTS[variant];
+async function renderVariant({
+  sourcePath,
+  relativeSource,
+  sourceMetadata,
+  profileName,
+  variant,
+}) {
+  const profile = OUTPUT_PROFILES[profileName];
+  const variantSettings = profile.variants[variant];
   const parsed = path.parse(relativeSource);
   const outputPath = path.join(
     OUTPUT_ROOT,
@@ -147,12 +334,21 @@ async function renderVariant({ sourcePath, relativeSource, sourceMetadata, varia
 
   // Sharp strips EXIF/XMP/IPTC metadata by default. Avoiding keepMetadata() or
   // withMetadata() is deliberate so production files contain pixels only.
-  await pipeline
-    .resize(resizeOptions(workingWidth, workingHeight, longEdge))
-    .toColourspace("srgb")
-    .sharpen({ sigma: 0.55, m1: 0.7, m2: 1.35, x1: 2, y2: 8, y3: 16 })
-    .webp(WEBP_OPTIONS)
-    .toFile(outputPath);
+  pipeline = pipeline.resize(
+    resizeOptions(workingWidth, workingHeight, variantSettings),
+  );
+
+  if (profile.grayscale) {
+    pipeline = pipeline.grayscale();
+  } else {
+    pipeline = pipeline.toColourspace("srgb");
+  }
+
+  if (profile.sharpen) {
+    pipeline = pipeline.sharpen(profile.sharpen);
+  }
+
+  await pipeline.webp(profile.webp).toFile(outputPath);
 
   const [outputMetadata, outputStat, digest] = await Promise.all([
     sharp(outputPath).metadata(),
@@ -164,7 +360,8 @@ async function renderVariant({ sourcePath, relativeSource, sourceMetadata, varia
     outputMetadata.format !== "webp" ||
     !outputMetadata.width ||
     !outputMetadata.height ||
-    Math.max(outputMetadata.width, outputMetadata.height) !== longEdge ||
+    Math.max(outputMetadata.width, outputMetadata.height) !==
+      expectedLongEdge(workingWidth, workingHeight, variantSettings) ||
     outputStat.size === 0
   ) {
     throw new Error(`Verification failed for ${publicUrl(outputPath)}.`);
@@ -177,6 +374,7 @@ async function renderVariant({ sourcePath, relativeSource, sourceMetadata, varia
     bytes: outputStat.size,
     sha256: digest,
     artDirectedCrop: artDirectedCrop ?? null,
+    profile: profileName,
   };
 }
 
@@ -186,6 +384,7 @@ async function prepareAsset(sourcePath) {
   }
 
   const relativeSource = sourceRelativePath(sourcePath);
+  const descriptor = assetDescriptor(relativeSource);
   const sourceMetadata = await sharp(sourcePath, { failOn: "error" }).metadata();
 
   if (
@@ -202,12 +401,14 @@ async function prepareAsset(sourcePath) {
       sourcePath,
       relativeSource,
       sourceMetadata,
+      profileName: descriptor.profile,
       variant: "desktop",
     }),
     renderVariant({
       sourcePath,
       relativeSource,
       sourceMetadata,
+      profileName: descriptor.profile,
       variant: "mobile",
     }),
   ]);
@@ -215,6 +416,10 @@ async function prepareAsset(sourcePath) {
   return {
     id: relativeSource.replace(/\.png$/i, ""),
     group: relativeSource.split("/")[0],
+    role: descriptor.role,
+    preloadRole: descriptor.preloadRole,
+    sequence: descriptor.sequence,
+    profile: descriptor.profile,
     source: publicUrl(sourcePath),
     sourceWidth: sourceMetadata.width,
     sourceHeight: sourceMetadata.height,
@@ -247,6 +452,25 @@ async function main() {
     throw new Error("No generated vehicle PNGs were found.");
   }
 
+  const sequenceSources = sources.filter((sourcePath) =>
+    sourceRelativePath(sourcePath).startsWith("senna/door-open-v2/"),
+  );
+  const expectedSequenceNames = Array.from(
+    { length: SEQUENCE_FRAME_COUNT },
+    (_, index) => `senna/door-open-v2/door-${String(index).padStart(3, "0")}.png`,
+  );
+  const actualSequenceNames = sequenceSources
+    .map(sourceRelativePath)
+    .sort((left, right) => left.localeCompare(right));
+  if (
+    actualSequenceNames.length !== expectedSequenceNames.length ||
+    actualSequenceNames.some((name, index) => name !== expectedSequenceNames[index])
+  ) {
+    throw new Error(
+      `Senna door sequence must contain exactly ${expectedSequenceNames.join(", ")}.`,
+    );
+  }
+
   await fs.rm(OUTPUT_ROOT, { recursive: true, force: true });
   await fs.mkdir(OUTPUT_ROOT, { recursive: true });
 
@@ -268,7 +492,7 @@ async function main() {
     0,
   );
   const manifest = {
-    version: 1,
+    version: 2,
     generatedBy: "scripts/prepare-vehicle-assets.mjs",
     sourcePolicy: {
       roots: SOURCE_GROUPS.map((group) => `/vehicles/${group}`),
@@ -278,10 +502,23 @@ async function main() {
       colourspace: "srgb",
       metadata: "stripped",
       resizeKernel: "lanczos3",
-      sharpen: { sigma: 0.55, m1: 0.7, m2: 1.35, x1: 2, y2: 8, y3: 16 },
-      webp: WEBP_OPTIONS,
-      variants: OUTPUT_VARIANTS,
+      profiles: OUTPUT_PROFILES,
     },
+    sequences: [
+      {
+        id: "senna-door-open-v2",
+        sourcePrefix: "/vehicles/senna/door-open-v2/door-",
+        optimizedPrefix: "/vehicles/optimized/senna/door-open-v2/door-",
+        frameCount: SEQUENCE_FRAME_COUNT,
+        firstFrame: 0,
+        lastFrame: SEQUENCE_FRAME_COUNT - 1,
+        interpolation: "discrete-scroll",
+        loading: {
+          initial: [0, 1, 2, SEQUENCE_FRAME_COUNT - 1],
+          neighborhoodRadius: 2,
+        },
+      },
+    ],
     sourceCount: sources.length,
     outputCount: outputFiles.length,
     totalOutputBytes,

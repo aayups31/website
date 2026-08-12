@@ -1,5 +1,11 @@
 # Automotive Portfolio Production Plan
 
+> **Runtime revision (August 2026):** the current prototype uses a five-part,
+> About-first edit — About / Skyline, Experience / Senna, Projects / scarlet
+> Formula, Creative, Contact. Any six-part Identity-first sequence below is
+> retained as historical planning context; `lib/automotive-timeline.ts` is the
+> authoritative runtime acceptance contract.
+
 **Status:** implementation-ready creative, motion, asset, accessibility, and engineering plan
 **Primary source:** `car_portfolio_ultimate_production_brief.md`
 **Factual content source:** `lib/content.ts`

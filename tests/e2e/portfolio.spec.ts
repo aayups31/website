@@ -1,13 +1,36 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+import {
+  AUTOMOTIVE_EDIT,
+  resolveAutomotiveTimeline,
+  type AutomotiveChapterId,
+  type AutomotiveShotId,
+} from "../../lib/automotive-timeline";
 
 const chapterAnchors = [
-  "opening",
+  "about",
   "experience",
   "projects",
-  "about",
   "creative",
   "contact",
-] as const;
+] as const satisfies readonly AutomotiveChapterId[];
+
+const chapterHeadings: Record<AutomotiveChapterId, string> = {
+  about: "Aayu Pratap Singh — Engineer & Founder",
+  experience: "Work that holds pressure.",
+  projects: "Decisions at race speed.",
+  creative: "Images with intent.",
+  contact: "Let’s build what moves next.",
+};
+
+const chapterActionHrefs: Record<AutomotiveChapterId, string> = {
+  about: "/about",
+  experience: "/experience",
+  projects: "/projects",
+  creative: "/archive",
+  contact: "mailto:aayupsuw@gmail.com",
+};
+
+const editProgress = (unit: number) => unit / AUTOMOTIVE_EDIT.total;
 
 async function setAutomotiveProgress(page: Page, progress: number) {
   await page.evaluate(async (nextProgress) => {
@@ -17,17 +40,38 @@ async function setAutomotiveProgress(page: Page, progress: number) {
     const top = root.getBoundingClientRect().top + window.scrollY;
     const travel = Math.max(0, root.offsetHeight - window.innerHeight);
     window.scrollTo({
-      top: top + travel * nextProgress,
+      top: top + travel * Math.min(1, Math.max(0, nextProgress)),
       behavior: "instant",
     });
     window.dispatchEvent(new Event("scroll"));
 
     await new Promise<void>((resolve) => {
       window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => resolve());
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => resolve());
+        });
       });
     });
   }, progress);
+}
+
+async function expectTimelineState(
+  page: Page,
+  home: Locator,
+  chapter: AutomotiveChapterId,
+  shot: AutomotiveShotId,
+) {
+  await expect
+    .poll(async () => ({
+      chapter: await home.getAttribute("data-active-chapter"),
+      shot: await home.getAttribute("data-active-shot"),
+    }))
+    .toEqual({ chapter, shot });
+  await expect(page.locator(`[data-chapter-link="${chapter}"]`)).toHaveAttribute(
+    "aria-current",
+    "location",
+  );
+  await expect(page.locator(`[data-action-chapter="${chapter}"]`).first()).toBeVisible();
 }
 
 async function horizontalOverflow(page: Page) {
@@ -36,10 +80,76 @@ async function horizontalOverflow(page: Page) {
   );
 }
 
+async function doorCanvasSignature(page: Page) {
+  return page.locator("canvas[data-door-sequence]").evaluate((element) => {
+    if (!(element instanceof HTMLCanvasElement) || element.width < 2 || element.height < 2) {
+      return null;
+    }
+
+    const sample = document.createElement("canvas");
+    sample.width = 24;
+    sample.height = 14;
+    const context = sample.getContext("2d", { willReadFrequently: true });
+    if (!context) return null;
+    context.drawImage(element, 0, 0, sample.width, sample.height);
+    const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
+    let hash = 2166136261;
+    let minimum = 255;
+    let maximum = 0;
+
+    for (let index = 0; index < pixels.length; index += 4) {
+      for (let channel = 0; channel < 3; channel += 1) {
+        const value = pixels[index + channel];
+        minimum = Math.min(minimum, value);
+        maximum = Math.max(maximum, value);
+        hash ^= value;
+        hash = Math.imul(hash, 16777619);
+      }
+    }
+
+    return maximum - minimum > 8 ? String(hash >>> 0) : null;
+  });
+}
+
 test.describe("automotive portfolio", () => {
-  test("exposes the complete six-chapter narrative without runtime video or reference media", async ({
+  test("uses the exact five-chapter production edit", () => {
+    expect(AUTOMOTIVE_EDIT).toEqual({
+      total: 285,
+      aboutEnd: 56,
+      experienceEnd: 136,
+      projectsEnd: 224,
+      creativeEnd: 266,
+      engineModelStart: 44.5,
+      engineModelEnd: 54.8,
+      doorStart: 110,
+      doorEnd: 126,
+    });
+
+    const exactBoundaries = [
+      { unit: 0, chapter: "about", shot: "identity" },
+      { unit: AUTOMOTIVE_EDIT.aboutEnd, chapter: "experience", shot: "senna-carbon" },
+      { unit: AUTOMOTIVE_EDIT.experienceEnd, chapter: "projects", shot: "tyre-match" },
+      { unit: AUTOMOTIVE_EDIT.projectsEnd, chapter: "creative", shot: "aperture" },
+      { unit: AUTOMOTIVE_EDIT.creativeEnd, chapter: "contact", shot: "end-frame" },
+      { unit: AUTOMOTIVE_EDIT.total, chapter: "contact", shot: "end-frame" },
+    ] as const satisfies ReadonlyArray<{
+      unit: number;
+      chapter: AutomotiveChapterId;
+      shot: AutomotiveShotId;
+    }>;
+
+    for (const boundary of exactBoundaries) {
+      expect(resolveAutomotiveTimeline(editProgress(boundary.unit))).toMatchObject({
+        chapterId: boundary.chapter,
+        shotId: boundary.shot,
+      });
+    }
+  });
+
+  test("exposes the complete About-first narrative without video or reference media", async ({
     page,
   }) => {
+    test.slow();
     const forbiddenRequests: string[] = [];
     page.on("request", (request) => {
       const url = decodeURIComponent(request.url());
@@ -51,43 +161,88 @@ test.describe("automotive portfolio", () => {
     const home = page.locator("[data-automotive-home]");
     await expect(home).toBeAttached();
     await expect(home).toHaveAttribute("data-ready", "true");
-    await expect(page.locator('[data-scene="opening"]')).toBeVisible();
-    await expect(page.locator('[data-shot="opening-body"]')).toBeVisible();
+    await expect(home).toHaveAttribute("data-intro-ready", "true");
+    await expect(page.locator('[aria-hidden="true"] [data-scene="about"]')).toBeVisible();
+    await expect(page.locator('[data-shot="skyline-intro"]')).toBeVisible();
+    await expect(page.locator('[data-automotive-home] > [aria-hidden="true"]').first()).toBeHidden();
+
+    const hero = page.locator('[data-shot="skyline-intro"] img');
     await expect
       .poll(() =>
-        page.locator('[data-shot="opening-body"] img').evaluate((image: HTMLImageElement) => ({
+        hero.evaluate((image: HTMLImageElement) => ({
           complete: image.complete,
           width: image.naturalWidth,
         })),
       )
       .toMatchObject({ complete: true });
-    await expect
-      .poll(() =>
-        page.locator('[data-shot="opening-body"] img').evaluate(
-          (image: HTMLImageElement) => image.currentSrc,
-        ),
-      )
-      .toMatch(/senna-body-macro-v1-(?:mobile|desktop)\.webp$/);
+    await expect.poll(() => hero.evaluate((image: HTMLImageElement) => image.currentSrc)).toMatch(
+      /skyline-hero-rear-three-quarter-v2-(?:mobile|desktop)\.webp(?:$|\?)/,
+    );
 
     for (const anchor of chapterAnchors) {
       await expect(page.locator(`#${anchor}`), `#${anchor}`).toHaveCount(1);
       await expect(
-        page.locator(`[data-chapter-link][href="#${anchor}"]`),
+        page.locator(`[data-chapter-link="${anchor}"][href="#${anchor}"]`),
         `chapter link for #${anchor}`,
       ).toHaveCount(1);
+      await expect(page.locator(`[data-chapter-link="${anchor}"]`)).toHaveAttribute(
+        "aria-label",
+        `Jump to ${anchor[0].toUpperCase()}${anchor.slice(1)}`,
+      );
+      await expect(
+        page.locator(`#${anchor}`).getByRole("heading", { name: chapterHeadings[anchor] }),
+      ).toBeAttached();
     }
 
-    await expect(
-      page.getByRole("heading", { name: "Systems under pressure." }),
-    ).toBeAttached();
-    await expect(
-      page.getByRole("heading", { name: "Decisions at race speed." }),
-    ).toBeAttached();
-    await expect(
-      page.getByRole("heading", { name: "Look beneath the surface." }),
-    ).toBeAttached();
+    const shortcutDock = page.getByRole("navigation", { name: "Portfolio shortcuts" });
+    await expect(shortcutDock).toBeVisible();
+    await expect(shortcutDock.locator("a")).toHaveCount(7);
+    await expect(page.locator('[data-action-chapter="about"]')).toBeVisible();
+    for (const chapter of chapterAnchors) {
+      await expect(page.locator(`[data-action-chapter="${chapter}"]`).first()).toHaveAttribute(
+        "href",
+        chapterActionHrefs[chapter],
+      );
+    }
 
-    await expect(page.locator("canvas")).toHaveCount(0);
+    const railTargets = await page.locator("[data-chapter-link]").evaluateAll((links) =>
+      links.map((link) => {
+        const rect = link.getBoundingClientRect();
+        return { width: rect.width, height: rect.height };
+      }),
+    );
+    expect(railTargets).toHaveLength(chapterAnchors.length);
+    for (const target of railTargets) {
+      expect(target.width).toBeGreaterThanOrEqual(44);
+      expect(target.height).toBeGreaterThanOrEqual(44);
+    }
+
+    const measuredChapterStarts = await page.evaluate((ids) => {
+      const root = document.querySelector<HTMLElement>("[data-automotive-home]");
+      if (!root) throw new Error("Automotive homepage was not mounted");
+      const rootTop = root.getBoundingClientRect().top + window.scrollY;
+      const travel = Math.max(1, root.offsetHeight - window.innerHeight);
+      return ids.map((id) => {
+        const section = document.getElementById(id);
+        if (!section) throw new Error(`Missing #${id}`);
+        const sectionTop = section.getBoundingClientRect().top + window.scrollY - rootTop;
+        return sectionTop / travel;
+      });
+    }, chapterAnchors);
+    const expectedChapterStarts = [
+      0,
+      editProgress(AUTOMOTIVE_EDIT.aboutEnd),
+      editProgress(AUTOMOTIVE_EDIT.experienceEnd),
+      editProgress(AUTOMOTIVE_EDIT.projectsEnd),
+      editProgress(AUTOMOTIVE_EDIT.creativeEnd),
+    ];
+    measuredChapterStarts.forEach((measured, index) => {
+      expect(Math.abs(measured - expectedChapterStarts[index])).toBeLessThan(0.002);
+    });
+
+    await expect(page.locator("canvas")).toHaveCount(2);
+    await expect(page.locator('canvas[data-engine-model][aria-hidden="true"]')).toHaveCount(1);
+    await expect(page.locator('canvas[data-door-sequence][aria-hidden="true"]')).toHaveCount(1);
     await expect(page.locator("video")).toHaveCount(0);
     await expect(page.locator("[autoplay]")).toHaveCount(0);
     await expect
@@ -108,14 +263,19 @@ test.describe("automotive portfolio", () => {
         ),
       )
       .toEqual([]);
-    await expect(page.locator("body")).not.toContainText(/dark vfx/i);
-    await expect(page.locator("body")).not.toContainText(/psychological horror/i);
 
-    for (const progress of [0.05, 0.2, 0.48, 0.7, 0.85, 0.97]) {
-      await setAutomotiveProgress(page, progress);
+    for (const unit of [
+      8,
+      AUTOMOTIVE_EDIT.aboutEnd + 2,
+      AUTOMOTIVE_EDIT.experienceEnd + 2,
+      AUTOMOTIVE_EDIT.projectsEnd + 2,
+      AUTOMOTIVE_EDIT.creativeEnd + 2,
+    ]) {
+      await setAutomotiveProgress(page, editProgress(unit));
     }
-
+    await setAutomotiveProgress(page, 1);
     await expect.poll(() => horizontalOverflow(page)).toBeLessThanOrEqual(1);
+
     const resourceRequests = await page.evaluate(() =>
       performance
         .getEntriesByType("resource")
@@ -126,45 +286,52 @@ test.describe("automotive portfolio", () => {
     expect(forbiddenRequests).toEqual([]);
   });
 
-  test("resolves the same chapter and shot at deterministic scroll positions and reverses to frame zero", async ({
+  test("resolves deterministic forward and reverse chapter and shot state", async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium", "desktop scroll timeline check");
+    test.slow();
     await page.goto("/");
 
     const home = page.locator("[data-automotive-home]");
     await expect(home).toHaveAttribute("data-ready", "true");
 
     const checkpoints = [
-      { progress: 0.05, chapter: "opening", shot: "identity" },
-      { progress: 0.2, chapter: "senna", shot: "wheel" },
-      { progress: 0.48, chapter: "f1", shot: "suspension" },
-      { progress: 0.7, chapter: "skyline", shot: "skyline-hero" },
-      { progress: 0.85, chapter: "creative", shot: "showreel" },
-      { progress: 0.97, chapter: "contact", shot: "end-frame" },
-    ] as const;
+      { unit: 0, chapter: "about", shot: "identity" },
+      {
+        unit: (AUTOMOTIVE_EDIT.engineModelStart + AUTOMOTIVE_EDIT.engineModelEnd) / 2,
+        chapter: "about",
+        shot: "engine-model",
+      },
+      { unit: AUTOMOTIVE_EDIT.aboutEnd + 1, chapter: "experience", shot: "senna-carbon" },
+      {
+        unit: (AUTOMOTIVE_EDIT.doorStart + AUTOMOTIVE_EDIT.doorEnd) / 2,
+        chapter: "experience",
+        shot: "senna-doors",
+      },
+      { unit: AUTOMOTIVE_EDIT.experienceEnd + 1, chapter: "projects", shot: "tyre-match" },
+      { unit: AUTOMOTIVE_EDIT.experienceEnd + 44, chapter: "projects", shot: "ferrari-suspension" },
+      { unit: AUTOMOTIVE_EDIT.projectsEnd + 1, chapter: "creative", shot: "aperture" },
+      { unit: AUTOMOTIVE_EDIT.projectsEnd + 20, chapter: "creative", shot: "vfx" },
+      { unit: AUTOMOTIVE_EDIT.creativeEnd + 1, chapter: "contact", shot: "end-frame" },
+    ] as const satisfies ReadonlyArray<{
+      unit: number;
+      chapter: AutomotiveChapterId;
+      shot: AutomotiveShotId;
+    }>;
 
     for (const checkpoint of checkpoints) {
-      await setAutomotiveProgress(page, checkpoint.progress);
-      await expect
-        .poll(() => home.getAttribute("data-active-chapter"))
-        .toBe(checkpoint.chapter);
-      await expect.poll(() => home.getAttribute("data-active-shot")).toBe(checkpoint.shot);
-      await expect(
-        page.locator(`[data-chapter-link="${checkpoint.chapter}"]`),
-      ).toHaveAttribute("aria-current", "true");
-      expect(await horizontalOverflow(page)).toBeLessThanOrEqual(1);
+      await setAutomotiveProgress(page, editProgress(checkpoint.unit));
+      await expectTimelineState(page, home, checkpoint.chapter, checkpoint.shot);
     }
 
-    await setAutomotiveProgress(page, 0.7);
-    await expect.poll(() => home.getAttribute("data-active-shot")).toBe("skyline-hero");
-    await setAutomotiveProgress(page, 0.05);
-    await expect.poll(() => home.getAttribute("data-active-chapter")).toBe("opening");
-    await expect.poll(() => home.getAttribute("data-active-shot")).toBe("identity");
+    for (const checkpoint of [...checkpoints].reverse()) {
+      await setAutomotiveProgress(page, editProgress(checkpoint.unit));
+      await expectTimelineState(page, home, checkpoint.chapter, checkpoint.shot);
+    }
 
     await setAutomotiveProgress(page, 0);
-    await expect.poll(() => home.getAttribute("data-active-chapter")).toBe("opening");
-    await expect.poll(() => home.getAttribute("data-active-shot")).toBe("darkness");
+    await expectTimelineState(page, home, "about", "identity");
     await expect
       .poll(() =>
         home.evaluate((element) =>
@@ -174,15 +341,43 @@ test.describe("automotive portfolio", () => {
       .toBeLessThanOrEqual(0.001);
   });
 
+  test("scrubs the door sequence forward and back to its first frame", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "chromium", "desktop canvas sequence check");
+    test.slow();
+    await page.goto("/");
+
+    const home = page.locator("[data-automotive-home]");
+    await expect(home).toHaveAttribute("data-ready", "true");
+
+    const door = page.locator("canvas[data-door-sequence]");
+    await setAutomotiveProgress(page, editProgress(AUTOMOTIVE_EDIT.doorEnd + 0.25));
+    await expectTimelineState(page, home, "experience", "senna-open");
+    await expect(door).toHaveAttribute("data-frame", "9");
+    await expect.poll(() => doorCanvasSignature(page), { timeout: 20_000 }).not.toBeNull();
+    const openSignature = await doorCanvasSignature(page);
+    expect(openSignature).not.toBeNull();
+
+    await setAutomotiveProgress(page, editProgress(AUTOMOTIVE_EDIT.doorStart - 1));
+    await expect(door).toHaveAttribute("data-frame", "0");
+    const closedSignature = await doorCanvasSignature(page);
+    expect(closedSignature).not.toBeNull();
+
+    await setAutomotiveProgress(page, editProgress(AUTOMOTIVE_EDIT.doorEnd + 0.25));
+    await expect(door).toHaveAttribute("data-frame", "9");
+    await setAutomotiveProgress(page, editProgress(AUTOMOTIVE_EDIT.doorStart - 1));
+    await expect(door).toHaveAttribute("data-frame", "0");
+  });
+
   test("keeps premium heading typography unchanged on hover", async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium", "desktop pointer typography check");
     await page.goto("/");
     await expect(page.locator("[data-automotive-home]")).toHaveAttribute("data-ready", "true");
-    await setAutomotiveProgress(page, 0.05);
+    await setAutomotiveProgress(page, editProgress(8));
 
-    const heading = page.locator('[data-copy="opening-identity"] h1');
+    const heading = page.locator('[data-copy="about-identity"] h1');
     await expect(heading).toBeVisible();
-
     const before = await heading.evaluate((element) => ({
       transform: getComputedStyle(element).transform,
       fontVariationSettings: getComputedStyle(element).fontVariationSettings,
@@ -192,7 +387,6 @@ test.describe("automotive portfolio", () => {
 
     await heading.hover({ force: true });
     await page.waitForTimeout(220);
-
     const after = await heading.evaluate((element) => ({
       transform: getComputedStyle(element).transform,
       fontVariationSettings: getComputedStyle(element).fontVariationSettings,
@@ -207,9 +401,9 @@ test.describe("automotive portfolio", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: /systems in motion/i }),
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: /f1 strategy engine/i })).toBeVisible();
-
-    await page.getByRole("link", { name: /f1 strategy engine/i }).click();
+    const strategyLink = page.getByRole("link", { name: /f1 strategy engine/i });
+    await expect(strategyLink).toBeVisible();
+    await strategyLink.click();
     await expect(page).toHaveURL(/\/projects\/f1-strategy-engine$/);
     await expect(
       page.getByRole("heading", { level: 1, name: /f1 strategy engine/i }),
@@ -226,56 +420,71 @@ test.describe("automotive portfolio", () => {
     await expect(page.getByText(/no invented client work/i)).toBeVisible();
   });
 
-  test("mobile navigation remains keyboard and touch accessible", async ({ page }, testInfo) => {
+  test("mobile navigation remains About-first, keyboard accessible, and touch accessible", async ({
+    page,
+  }, testInfo) => {
     test.skip(testInfo.project.name !== "mobile", "mobile-only navigation check");
     await page.goto("/");
 
-    const menuButton = page.locator(".menu-button");
-    await expect(menuButton).toBeVisible();
-    await expect(menuButton).toContainText("Menu");
+    const menuButton = page.getByRole("button", { name: "Menu", exact: true });
+    await expect(menuButton).toHaveCount(1);
     await menuButton.click();
 
+    await expect(page.locator(".menu-button")).toHaveAttribute("aria-expanded", "true");
     const mobileMenu = page.getByRole("navigation", { name: "Mobile navigation" });
-    await expect(menuButton).toHaveAttribute("aria-expanded", "true");
-    await expect(mobileMenu.getByRole("link", { name: /experience/i })).toBeVisible();
-    await expect(mobileMenu.getByRole("link", { name: /projects/i })).toBeVisible();
-    await expect(mobileMenu.getByRole("link", { name: /about/i })).toBeVisible();
-    await expect(mobileMenu.getByRole("link", { name: /vfx \/ photography/i })).toBeVisible();
-    await expect(mobileMenu.getByRole("link", { name: /résumé/i })).toBeVisible();
-    await expect(mobileMenu.getByRole("link", { name: /contact/i })).toBeVisible();
+    await expect(mobileMenu).toBeVisible();
+    const mobileHrefs = await mobileMenu.locator("a").evaluateAll((links) =>
+      links.map((link) => link.getAttribute("href")),
+    );
+    expect(mobileHrefs).toEqual([
+      "/about",
+      "/experience",
+      "/projects",
+      "/archive",
+      "/resume",
+      "/contact",
+    ]);
+    for (const label of [
+      /about/i,
+      /experience/i,
+      /projects/i,
+      /vfx \/ photography/i,
+      /résumé/i,
+      /contact/i,
+    ]) {
+      await expect(mobileMenu.getByRole("link", { name: label })).toBeVisible();
+    }
 
     await page.keyboard.press("Escape");
-    await expect(menuButton).toHaveAttribute("aria-expanded", "false");
-    await expect(menuButton).toBeFocused();
+    const closedMenuButton = page.getByRole("button", { name: "Menu", exact: true });
+    await expect(closedMenuButton).toHaveAttribute("aria-expanded", "false");
+    await expect(closedMenuButton).toBeFocused();
     expect(await horizontalOverflow(page)).toBeLessThanOrEqual(1);
   });
 
-  test("manual reduced motion persists and exposes six editorial panels", async ({
+  test("manual reduced motion persists and exposes five semantic editorial panels", async ({
     page,
   }, testInfo) => {
     test.skip(testInfo.project.name !== "chromium", "desktop experience control check");
     await page.goto("/");
 
     const motionControl = page.locator(".utility-button").filter({ hasText: "Motion" });
+    await expect(motionControl).toHaveCount(1);
     await motionControl.click();
     await expect(motionControl).toHaveAttribute("aria-pressed", "true");
 
     const home = page.locator("[data-automotive-home]");
     await expect(home).toHaveAttribute("data-motion-mode", "reduced");
     await expect(page.locator("html")).toHaveAttribute("data-motion", "reduced");
-    await expect(page.locator("[data-scene]").first()).toBeHidden();
+    await expect(page.locator('[data-scene="about"]')).toBeHidden();
+    await expect(page.getByRole("navigation", { name: "Portfolio shortcuts" })).toBeHidden();
 
-    const reducedHeadings = [
-      "Engineering in motion.",
-      "Systems under pressure.",
-      "Decisions at race speed.",
-      "Look beneath the surface.",
-      "Frames with intent.",
-      "Let’s build what moves next.",
-    ];
-    for (const [index, anchor] of chapterAnchors.entries()) {
+    for (const anchor of chapterAnchors) {
       const panel = page.locator(`#${anchor}`);
-      await expect(panel.getByRole("heading", { name: reducedHeadings[index] })).toBeVisible();
+      await expect(panel.getByRole("heading", { name: chapterHeadings[anchor] })).toBeVisible();
+      const action = panel.locator(`a[href="${chapterActionHrefs[anchor]}"]`);
+      await expect(action).toBeVisible();
+      expect(await action.evaluate((element) => element.closest("[inert]") === null)).toBe(true);
     }
 
     await expect.poll(() => page.evaluate(() => localStorage.getItem("portfolio-motion"))).toBe(

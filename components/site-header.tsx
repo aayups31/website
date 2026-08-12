@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import { useExperienceStore } from "@/lib/experience-store";
 
 const navigation = [
+  { label: "About", href: "/about" },
   { label: "Experience", href: "/experience" },
   { label: "Projects", href: "/projects" },
-  { label: "About", href: "/about" },
   { label: "VFX / Photography", href: "/archive" },
   { label: "Résumé", href: "/resume" },
 ];

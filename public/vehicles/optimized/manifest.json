@@ -1,11 +1,12 @@
 {
-  "version": 1,
+  "version": 2,
   "generatedBy": "scripts/prepare-vehicle-assets.mjs",
   "sourcePolicy": {
     "roots": [
       "/vehicles/senna",
       "/vehicles/f1",
-      "/vehicles/skyline"
+      "/vehicles/skyline",
+      "/vehicles/effects"
     ],
     "excluded": [
       "/Images",
@@ -16,36 +17,178 @@
     "colourspace": "srgb",
     "metadata": "stripped",
     "resizeKernel": "lanczos3",
-    "sharpen": {
-      "sigma": 0.55,
-      "m1": 0.7,
-      "m2": 1.35,
-      "x1": 2,
-      "y2": 8,
-      "y3": 16
-    },
-    "webp": {
-      "quality": 86,
-      "effort": 6,
-      "smartSubsample": true,
-      "preset": "photo"
-    },
-    "variants": {
-      "desktop": {
-        "longEdge": 3840
+    "profiles": {
+      "plate": {
+        "grayscale": false,
+        "sharpen": {
+          "sigma": 0.55,
+          "m1": 0.7,
+          "m2": 1.35,
+          "x1": 2,
+          "y2": 8,
+          "y3": 16
+        },
+        "webp": {
+          "quality": 86,
+          "effort": 6,
+          "smartSubsample": true,
+          "preset": "photo"
+        },
+        "variants": {
+          "desktop": {
+            "longEdge": 2560,
+            "withoutEnlargement": false
+          },
+          "mobile": {
+            "longEdge": 1440,
+            "withoutEnlargement": false
+          }
+        }
       },
-      "mobile": {
-        "longEdge": 2160
+      "sequenceFrame": {
+        "grayscale": false,
+        "sharpen": {
+          "sigma": 0.4,
+          "m1": 0.55,
+          "m2": 1.1,
+          "x1": 2,
+          "y2": 8,
+          "y3": 16
+        },
+        "webp": {
+          "quality": 80,
+          "effort": 6,
+          "smartSubsample": true,
+          "preset": "photo"
+        },
+        "variants": {
+          "desktop": {
+            "longEdge": 1920,
+            "withoutEnlargement": false
+          },
+          "mobile": {
+            "longEdge": 1280,
+            "withoutEnlargement": false
+          }
+        }
+      },
+      "effect": {
+        "grayscale": true,
+        "sharpen": null,
+        "webp": {
+          "quality": 88,
+          "effort": 6,
+          "smartSubsample": false,
+          "preset": "picture"
+        },
+        "variants": {
+          "desktop": {
+            "longEdge": 1440,
+            "withoutEnlargement": true
+          },
+          "mobile": {
+            "longEdge": 1024,
+            "withoutEnlargement": true
+          }
+        }
       }
     }
   },
-  "sourceCount": 9,
-  "outputCount": 18,
-  "totalOutputBytes": 4173650,
+  "sequences": [
+    {
+      "id": "senna-door-open-v2",
+      "sourcePrefix": "/vehicles/senna/door-open-v2/door-",
+      "optimizedPrefix": "/vehicles/optimized/senna/door-open-v2/door-",
+      "frameCount": 10,
+      "firstFrame": 0,
+      "lastFrame": 9,
+      "interpolation": "discrete-scroll",
+      "loading": {
+        "initial": [
+          0,
+          1,
+          2,
+          9
+        ],
+        "neighborhoodRadius": 2
+      }
+    }
+  ],
+  "sourceCount": 33,
+  "outputCount": 66,
+  "totalOutputBytes": 7964644,
   "assets": [
+    {
+      "id": "effects/skyline-engine-depth-v1",
+      "group": "effects",
+      "role": "skyline-engine-depth-map",
+      "preloadRole": "paired-reveal",
+      "sequence": null,
+      "profile": "effect",
+      "source": "/vehicles/effects/skyline-engine-depth-v1.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1057991,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/effects/skyline-engine-depth-v1-desktop.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 21304,
+          "sha256": "2e458adf184f4b1767f0926b4adf7f88b740bec6f763a588b11c08e62ce94f5c",
+          "artDirectedCrop": null,
+          "profile": "effect"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/effects/skyline-engine-depth-v1-mobile.webp",
+          "width": 1024,
+          "height": 576,
+          "bytes": 13560,
+          "sha256": "85d86566f493f523444ce73c535a99d8107f8232b447b23d92ea6df8e97803c8",
+          "artDirectedCrop": null,
+          "profile": "effect"
+        }
+      }
+    },
+    {
+      "id": "effects/skyline-engine-ink-mask-v1",
+      "group": "effects",
+      "role": "skyline-engine-reveal-mask",
+      "preloadRole": "paired-reveal",
+      "sequence": null,
+      "profile": "effect",
+      "source": "/vehicles/effects/skyline-engine-ink-mask-v1.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 2458373,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/effects/skyline-engine-ink-mask-v1-desktop.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 256164,
+          "sha256": "9bf4749a205a518d1ffb91f588821b08c10df2c23b21cc4f99c4bbc897251478",
+          "artDirectedCrop": null,
+          "profile": "effect"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/effects/skyline-engine-ink-mask-v1-mobile.webp",
+          "width": 1024,
+          "height": 576,
+          "bytes": 144100,
+          "sha256": "8264ccd7ad961e89cafc298df4eb9ef56b6debc55c3654b5312573c3b68d1d25",
+          "artDirectedCrop": null,
+          "profile": "effect"
+        }
+      }
+    },
     {
       "id": "f1/f1-cockpit-v1",
       "group": "f1",
+      "role": "supporting-plate",
+      "preloadRole": "on-demand",
+      "sequence": null,
+      "profile": "plate",
       "source": "/vehicles/f1/f1-cockpit-v1.png",
       "sourceWidth": 1672,
       "sourceHeight": 941,
@@ -53,25 +196,31 @@
       "outputs": {
         "desktop": {
           "src": "/vehicles/optimized/f1/f1-cockpit-v1-desktop.webp",
-          "width": 3840,
-          "height": 2161,
-          "bytes": 363462,
-          "sha256": "0e3704ffe4eb77a57135889478b3110cb99272d05e3b997929e75e3d251d858a",
-          "artDirectedCrop": null
+          "width": 2560,
+          "height": 1441,
+          "bytes": 240780,
+          "sha256": "c53ebeaffa44ee9e69588c597ae17c6997cc5428fc7e8ccc5d42d9e572bcfebf",
+          "artDirectedCrop": null,
+          "profile": "plate"
         },
         "mobile": {
           "src": "/vehicles/optimized/f1/f1-cockpit-v1-mobile.webp",
-          "width": 2160,
-          "height": 1216,
-          "bytes": 203332,
-          "sha256": "c1f8383483874897ee6330694f498bb32e6c73beaaa31a006fd6288ea27b5c18",
-          "artDirectedCrop": null
+          "width": 1440,
+          "height": 810,
+          "bytes": 136764,
+          "sha256": "edeb671b16cc5d2cb9fdeb39df9b61c51a7536fff93373a55927eb59e13c0c37",
+          "artDirectedCrop": null,
+          "profile": "plate"
         }
       }
     },
     {
       "id": "f1/f1-hero-v1",
       "group": "f1",
+      "role": "supporting-plate",
+      "preloadRole": "on-demand",
+      "sequence": null,
+      "profile": "plate",
       "source": "/vehicles/f1/f1-hero-v1.png",
       "sourceWidth": 1672,
       "sourceHeight": 941,
@@ -79,25 +228,593 @@
       "outputs": {
         "desktop": {
           "src": "/vehicles/optimized/f1/f1-hero-v1-desktop.webp",
-          "width": 3840,
-          "height": 2161,
-          "bytes": 291266,
-          "sha256": "c46cc73ea3ad5586e1422bc790c87048304834ba9511abd9aadd77896233119f",
-          "artDirectedCrop": null
+          "width": 2560,
+          "height": 1441,
+          "bytes": 184192,
+          "sha256": "4427927ae1c25a3722a54d8039dc22dee19cfb6cc0ce78041e017e6bb52ac0c8",
+          "artDirectedCrop": null,
+          "profile": "plate"
         },
         "mobile": {
           "src": "/vehicles/optimized/f1/f1-hero-v1-mobile.webp",
-          "width": 2160,
-          "height": 1216,
-          "bytes": 148200,
-          "sha256": "4d1d6f064ec45050de4774b6b0c32e8eca4774863dc12f7b88f2c2adc4bdd770",
-          "artDirectedCrop": null
+          "width": 1440,
+          "height": 810,
+          "bytes": 100316,
+          "sha256": "c0160804439e724d463fe9b60d4619332070dd6a01ee3ee163ee2be166975a7a",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "f1/ferrari/front-hero-v1",
+      "group": "f1",
+      "role": "f1-front-hero",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/f1/ferrari/front-hero-v1.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1837122,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/f1/ferrari/front-hero-v1-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 215170,
+          "sha256": "96529ab62fd7bc81c463f9e319cf9f418270cdf1a21cdc7401ecc1898ace8379",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/f1/ferrari/front-hero-v1-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 117042,
+          "sha256": "f62600b93cab7b1ffb9cfb7f78dab8c4d74ddca9deeccd9e70495fa03c1c0b1a",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "f1/ferrari/rear-light-v1",
+      "group": "f1",
+      "role": "f1-rear-light-handoff",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/f1/ferrari/rear-light-v1.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1805994,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/f1/ferrari/rear-light-v1-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 168158,
+          "sha256": "cc4dc66279657ca85d358af58a9d66571b9166fdb40f155065ba233ddce1c671",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/f1/ferrari/rear-light-v1-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 91400,
+          "sha256": "e5e51ad8f44a89ac288ee4c4b8b27b7172d808233b6dd69f228f5a7e922a5439",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "f1/ferrari/side-speed-v1",
+      "group": "f1",
+      "role": "f1-side-speed",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/f1/ferrari/side-speed-v1.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1426687,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/f1/ferrari/side-speed-v1-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 108388,
+          "sha256": "9ba13a4a8fc6726834e62899658c214527a0550d0d151c2b8900070650a6c711",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/f1/ferrari/side-speed-v1-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 57308,
+          "sha256": "4c24f18208354bf794bb0ffba62af2d787db999ad4e4677819e3082d40ca9ed9",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "f1/ferrari/steering-cockpit-v1",
+      "group": "f1",
+      "role": "f1-steering-cockpit",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/f1/ferrari/steering-cockpit-v1.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1844995,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/f1/ferrari/steering-cockpit-v1-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 197604,
+          "sha256": "b2ba979b208493e1f43cdb47a41b229e6554a896215a761f13354820e38ce08d",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/f1/ferrari/steering-cockpit-v1-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 105786,
+          "sha256": "b9cc6c93e494807f4f5a1d033e6813e026d59400cd753c9f6cfc534d165b056f",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "f1/ferrari/suspension-macro-v1",
+      "group": "f1",
+      "role": "f1-suspension",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/f1/ferrari/suspension-macro-v1.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 2060421,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/f1/ferrari/suspension-macro-v1-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 242202,
+          "sha256": "80910327c15ae8586965d2917715ce7675815fbff1cf1a545956360fe76bea82",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/f1/ferrari/suspension-macro-v1-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 136336,
+          "sha256": "e215abc1d43ebb5a6c14625caba1ad33dd77a39a92479666b8ad97ae10826b94",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "f1/ferrari/tyre-macro-v1",
+      "group": "f1",
+      "role": "f1-tyre-match",
+      "preloadRole": "chapter-entry",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/f1/ferrari/tyre-macro-v1.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1826864,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/f1/ferrari/tyre-macro-v1-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 195528,
+          "sha256": "a9f5a0014bf2787ca3f73845298db14045ae5c37fbc28c76f5f20bf41c2cc793",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/f1/ferrari/tyre-macro-v1-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 109400,
+          "sha256": "3fa43a8e453a20dee6ca004fea3c6b1ce5dec71b4b135f9b3d94351c8fbf52b5",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-000",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-poster",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 0,
+        "frameCount": 10,
+        "progress": 0
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-000.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1668982,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-000-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 89608,
+          "sha256": "fecaafc36d1a298951338c13245e4d7b51021148234677e4d97a27077d1133c8",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-000-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 54072,
+          "sha256": "2055cac11d4b85f51be5e2330ac8d5bc543cae5be7c07e821b3e304371b6925e",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-001",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-seed",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 1,
+        "frameCount": 10,
+        "progress": 0.1111111111111111
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-001.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1671456,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-001-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 94488,
+          "sha256": "23665964bacbc1a647fad5117f63fef2cad3d64b3303d6dfbceabefbaebdabef",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-001-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 57646,
+          "sha256": "fc6a6d5f9a6c512a6285c476829308014d03f337053df64c72fa64d9e5be7432",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-002",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-seed",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 2,
+        "frameCount": 10,
+        "progress": 0.2222222222222222
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-002.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1645222,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-002-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 94232,
+          "sha256": "67d7aab5b665d9e0864bd9770addc7588ddcf45dd6fc4eebc2563e6bdad35f85",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-002-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 57960,
+          "sha256": "a5e1b7757b80286b392f0747ae3e141f8d48996bef294a784f8dcd9e3ee6277c",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-003",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-neighbor",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 3,
+        "frameCount": 10,
+        "progress": 0.3333333333333333
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-003.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1654264,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-003-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 94722,
+          "sha256": "365619bb8bb1cbd844535d4bb876d2b57e10c6882b73753dc073c067c3acc720",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-003-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 57526,
+          "sha256": "65306f55dc696c35b98ce2900853a08cb1b9aa7da08b6407d90b82679ec5f689",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-004",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-neighbor",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 4,
+        "frameCount": 10,
+        "progress": 0.4444444444444444
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-004.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1762766,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-004-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 97110,
+          "sha256": "b33d99d82332ad2592460f45e55260610b40b5507bd6b30bc61cc4cba4d62a7a",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-004-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 59856,
+          "sha256": "f426d1fb3d1779b2ee9d5c6331db069d6af97071c6b7c1b4c0c9968c645e5eaf",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-005",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-neighbor",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 5,
+        "frameCount": 10,
+        "progress": 0.5555555555555556
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-005.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1730531,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-005-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 92832,
+          "sha256": "2c0fb3dacf6f16cfa7070e7c029c496c7c8908115d98a62de2c7b40c29b10713",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-005-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 57678,
+          "sha256": "09806717cb7ec30bed59eac6ad9cc3e4ca44f715946969beb69e6449b191e0c4",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-006",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-neighbor",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 6,
+        "frameCount": 10,
+        "progress": 0.6666666666666666
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-006.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1702158,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-006-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 92032,
+          "sha256": "20d83a32aadd0dca3936661cc65b9882d4ded25b99bdddb975e44edcf024b7b2",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-006-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 57542,
+          "sha256": "9b6cf04e325a23d6a6006d064f2677a2fbdfa1d9130d288f7987bed8b6fff94e",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-007",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-neighbor",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 7,
+        "frameCount": 10,
+        "progress": 0.7777777777777778
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-007.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1772673,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-007-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 97454,
+          "sha256": "053479e997347ec8e437c40b864d6c21d5032691b38d83ebb9085e1140b99d4a",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-007-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 60668,
+          "sha256": "fb8fd409c0c7ba05aec388ef46a31ff8f8e6ee2e6a5e80732ad3a5fb97f8e108",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-008",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-neighbor",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 8,
+        "frameCount": 10,
+        "progress": 0.8888888888888888
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-008.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1863339,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-008-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 100336,
+          "sha256": "26f51a27a1341886f3eaf93fdfa60b90fd70a5dee268efd3693ae3fe299b097c",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-008-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 61420,
+          "sha256": "087b1e0177a0867bda1e2bd2c05e3f93529a9d78058f5624f3b7656c9886b13f",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        }
+      }
+    },
+    {
+      "id": "senna/door-open-v2/door-009",
+      "group": "senna",
+      "role": "senna-door-open-frame",
+      "preloadRole": "sequence-poster",
+      "sequence": {
+        "id": "senna-door-open-v2",
+        "frameIndex": 9,
+        "frameCount": 10,
+        "progress": 1
+      },
+      "profile": "sequenceFrame",
+      "source": "/vehicles/senna/door-open-v2/door-009.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1901591,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-009-desktop.webp",
+          "width": 1920,
+          "height": 1081,
+          "bytes": 102368,
+          "sha256": "03221e21f94cc70737277f3faba5a3b92222ed148ac476de063d5e6bc3dabadd",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/senna/door-open-v2/door-009-mobile.webp",
+          "width": 1280,
+          "height": 720,
+          "bytes": 62212,
+          "sha256": "579e276b76f593ca1344679ef50c62cc606afb4fcf58f48e7af74562e94cbe2c",
+          "artDirectedCrop": null,
+          "profile": "sequenceFrame"
         }
       }
     },
     {
       "id": "senna/senna-body-macro-v1",
       "group": "senna",
+      "role": "opening-body-macro",
+      "preloadRole": "critical",
+      "sequence": null,
+      "profile": "plate",
       "source": "/vehicles/senna/senna-body-macro-v1.png",
       "sourceWidth": 1672,
       "sourceHeight": 941,
@@ -105,25 +822,31 @@
       "outputs": {
         "desktop": {
           "src": "/vehicles/optimized/senna/senna-body-macro-v1-desktop.webp",
-          "width": 3840,
-          "height": 2161,
-          "bytes": 234480,
-          "sha256": "73799f8f988b6ed3794628235b08d7e594daa6e221d66df220ad4fb315425a22",
-          "artDirectedCrop": null
+          "width": 2560,
+          "height": 1441,
+          "bytes": 142856,
+          "sha256": "00982dcff39f58cd8550ca313acb5fba622bffd7959cbb751ce3545d8713fcb4",
+          "artDirectedCrop": null,
+          "profile": "plate"
         },
         "mobile": {
           "src": "/vehicles/optimized/senna/senna-body-macro-v1-mobile.webp",
-          "width": 2160,
-          "height": 1216,
-          "bytes": 117174,
-          "sha256": "7b5fe019d2c2521a660f28604e19b2ef822367d6cc965615804c90a89b44f27d",
-          "artDirectedCrop": null
+          "width": 1440,
+          "height": 810,
+          "bytes": 75462,
+          "sha256": "3ba0b9f5a47484d79d15d97d96f9eff849c390d0790060be3133620073984373",
+          "artDirectedCrop": null,
+          "profile": "plate"
         }
       }
     },
     {
       "id": "senna/senna-exhaust-macro-v1",
       "group": "senna",
+      "role": "senna-exhaust",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
       "source": "/vehicles/senna/senna-exhaust-macro-v1.png",
       "sourceWidth": 1672,
       "sourceHeight": 941,
@@ -131,25 +854,31 @@
       "outputs": {
         "desktop": {
           "src": "/vehicles/optimized/senna/senna-exhaust-macro-v1-desktop.webp",
-          "width": 3840,
-          "height": 2161,
-          "bytes": 227888,
-          "sha256": "547f86c895f49582849d122673eb17be5afbb4fa1aaee68b7907f0df1b0e12f9",
-          "artDirectedCrop": null
+          "width": 2560,
+          "height": 1441,
+          "bytes": 145910,
+          "sha256": "33449fcfec34516f255b3b40fa2f93b616d1d29954aa09ec4cab0cb5a3d5e232",
+          "artDirectedCrop": null,
+          "profile": "plate"
         },
         "mobile": {
           "src": "/vehicles/optimized/senna/senna-exhaust-macro-v1-mobile.webp",
-          "width": 2160,
-          "height": 1216,
-          "bytes": 120860,
-          "sha256": "25ce0585db02f7bdd4cc8eb5ea6c0fd584008fe0121d94a6c087787620473f08",
-          "artDirectedCrop": null
+          "width": 1440,
+          "height": 810,
+          "bytes": 79920,
+          "sha256": "be2fd3c2e8fd5d9ffb3fe711d3bedb1f20e93432d8813d8cdd4b3f59cd52daea",
+          "artDirectedCrop": null,
+          "profile": "plate"
         }
       }
     },
     {
       "id": "senna/senna-hero-closed-v1",
       "group": "senna",
+      "role": "senna-hero-closed",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
       "source": "/vehicles/senna/senna-hero-closed-v1.png",
       "sourceWidth": 1672,
       "sourceHeight": 941,
@@ -157,25 +886,31 @@
       "outputs": {
         "desktop": {
           "src": "/vehicles/optimized/senna/senna-hero-closed-v1-desktop.webp",
-          "width": 3840,
-          "height": 2161,
-          "bytes": 258578,
-          "sha256": "79b91b0d4a562279c8cf93abde8d04f6c28863b704b151dcd55f864317f72152",
-          "artDirectedCrop": null
+          "width": 2560,
+          "height": 1441,
+          "bytes": 164570,
+          "sha256": "78f83c93121a09349b62deec18984b2527377e23518d19885af7ea9997455c75",
+          "artDirectedCrop": null,
+          "profile": "plate"
         },
         "mobile": {
           "src": "/vehicles/optimized/senna/senna-hero-closed-v1-mobile.webp",
-          "width": 2160,
-          "height": 1216,
-          "bytes": 137122,
-          "sha256": "ddd0745d2018c55c97971176618ed74fd23de0a5d04780e52f723169fe6635e8",
-          "artDirectedCrop": null
+          "width": 1440,
+          "height": 810,
+          "bytes": 91044,
+          "sha256": "e7f0d7ae457926104ad72cfa0adf4ca785d406c5090904950be660148bbd9562",
+          "artDirectedCrop": null,
+          "profile": "plate"
         }
       }
     },
     {
       "id": "senna/senna-hero-open-v1",
       "group": "senna",
+      "role": "senna-hero-open-fallback",
+      "preloadRole": "on-demand",
+      "sequence": null,
+      "profile": "plate",
       "source": "/vehicles/senna/senna-hero-open-v1.png",
       "sourceWidth": 1672,
       "sourceHeight": 941,
@@ -183,25 +918,31 @@
       "outputs": {
         "desktop": {
           "src": "/vehicles/optimized/senna/senna-hero-open-v1-desktop.webp",
-          "width": 3840,
-          "height": 2161,
-          "bytes": 340048,
-          "sha256": "3bb4543bfc747aa89a5448449516f86c91ebee85a7ff5a65c993737cc734730a",
-          "artDirectedCrop": null
+          "width": 2560,
+          "height": 1441,
+          "bytes": 219252,
+          "sha256": "28c2eb1693a4520b5b381ba9779272408e0f8fbe6988c36a52e3564356ac9e36",
+          "artDirectedCrop": null,
+          "profile": "plate"
         },
         "mobile": {
           "src": "/vehicles/optimized/senna/senna-hero-open-v1-mobile.webp",
-          "width": 2160,
-          "height": 1216,
-          "bytes": 180708,
-          "sha256": "cdd381327ef49033d8cd0b3d8f17db492ee0d3bbcb0bf275fdd09451479c3967",
-          "artDirectedCrop": null
+          "width": 1440,
+          "height": 810,
+          "bytes": 116642,
+          "sha256": "aee6d8b7efa3a86a3d1502c38edcad2323f063e8391c04b1e658b64e1c073206",
+          "artDirectedCrop": null,
+          "profile": "plate"
         }
       }
     },
     {
       "id": "senna/senna-wheel-macro-v1",
       "group": "senna",
+      "role": "senna-wheel",
+      "preloadRole": "chapter-entry",
+      "sequence": null,
+      "profile": "plate",
       "source": "/vehicles/senna/senna-wheel-macro-v1.png",
       "sourceWidth": 1672,
       "sourceHeight": 941,
@@ -209,25 +950,31 @@
       "outputs": {
         "desktop": {
           "src": "/vehicles/optimized/senna/senna-wheel-macro-v1-desktop.webp",
-          "width": 3840,
-          "height": 2161,
-          "bytes": 376920,
-          "sha256": "3d917557d5296a285662825b7aeffbc3641587c67bc0a06a71ffa2b724f464df",
-          "artDirectedCrop": null
+          "width": 2560,
+          "height": 1441,
+          "bytes": 243538,
+          "sha256": "5a70426636bf7e1c0da81a7dd4407e7186ae1b1e5a9988de748151996e6b5f35",
+          "artDirectedCrop": null,
+          "profile": "plate"
         },
         "mobile": {
           "src": "/vehicles/optimized/senna/senna-wheel-macro-v1-mobile.webp",
-          "width": 2160,
-          "height": 1216,
-          "bytes": 206224,
-          "sha256": "5301980b6473e78f5229eb4119da9fa58c59e7d9b7a9c254deb3064c6b3ff6f9",
-          "artDirectedCrop": null
+          "width": 1440,
+          "height": 810,
+          "bytes": 141198,
+          "sha256": "9bd0bbba6796c0d80adb66b38e6f55577e3d43d1e074611c717fd351c1c150a7",
+          "artDirectedCrop": null,
+          "profile": "plate"
         }
       }
     },
     {
       "id": "skyline/skyline-hero-closed-v1",
       "group": "skyline",
+      "role": "supporting-plate",
+      "preloadRole": "on-demand",
+      "sequence": null,
+      "profile": "plate",
       "source": "/vehicles/skyline/skyline-hero-closed-v1.png",
       "sourceWidth": 1672,
       "sourceHeight": 941,
@@ -235,25 +982,31 @@
       "outputs": {
         "desktop": {
           "src": "/vehicles/optimized/skyline/skyline-hero-closed-v1-desktop.webp",
-          "width": 3840,
-          "height": 2161,
-          "bytes": 266518,
-          "sha256": "04b834395290289e02130df34309b94278f62c52d3cc7fcebb84fc9ec6179201",
-          "artDirectedCrop": null
+          "width": 2560,
+          "height": 1441,
+          "bytes": 174582,
+          "sha256": "3b183ee055c1b803783e3e381b6737b649dfe1953782079c62c0e60ba4c78bd2",
+          "artDirectedCrop": null,
+          "profile": "plate"
         },
         "mobile": {
           "src": "/vehicles/optimized/skyline/skyline-hero-closed-v1-mobile.webp",
-          "width": 2160,
-          "height": 1216,
-          "bytes": 143816,
-          "sha256": "4a56f802a01915ce2d412d3474c16dbaaa4a8c284a37029b3f37476a318b710b",
-          "artDirectedCrop": null
+          "width": 1440,
+          "height": 810,
+          "bytes": 96150,
+          "sha256": "b8bfe2a2da1d7a38578ad469f9739003efa9478d894822a70f31887fb37e419b",
+          "artDirectedCrop": null,
+          "profile": "plate"
         }
       }
     },
     {
       "id": "skyline/skyline-hero-xray-v1",
       "group": "skyline",
+      "role": "supporting-plate",
+      "preloadRole": "on-demand",
+      "sequence": null,
+      "profile": "plate",
       "source": "/vehicles/skyline/skyline-hero-xray-v1.png",
       "sourceWidth": 1672,
       "sourceHeight": 941,
@@ -261,19 +1014,213 @@
       "outputs": {
         "desktop": {
           "src": "/vehicles/optimized/skyline/skyline-hero-xray-v1-desktop.webp",
-          "width": 3840,
-          "height": 2161,
-          "bytes": 361266,
-          "sha256": "4600b031463eb49a20551f9a2d45634558e4fc4bb10f9433f0ac2e5c9855e34f",
-          "artDirectedCrop": null
+          "width": 2560,
+          "height": 1441,
+          "bytes": 233624,
+          "sha256": "1df3f71927d8db7fd51c79fe1910995401fd9e34776e868920b1dce86d585f3f",
+          "artDirectedCrop": null,
+          "profile": "plate"
         },
         "mobile": {
           "src": "/vehicles/optimized/skyline/skyline-hero-xray-v1-mobile.webp",
-          "width": 2160,
-          "height": 1216,
-          "bytes": 195788,
-          "sha256": "1442b74e4085558180c2a617c32e73cdde11ea5eb3b27837c9cdd4a7fe983baa",
-          "artDirectedCrop": null
+          "width": 1440,
+          "height": 810,
+          "bytes": 122480,
+          "sha256": "681219e559d8a9bd0498ffd225e834e3e42a40342dc376968e82c5901ca31022",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "skyline/v2/skyline-engine-front-closed-reg-v2",
+      "group": "skyline",
+      "role": "skyline-engine-closed",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/skyline/v2/skyline-engine-front-closed-reg-v2.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1514810,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-engine-front-closed-reg-v2-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 135442,
+          "sha256": "b11abe8195bbbcf161702ee2f2f59e7de2322c5296eda729f705801edf9df768",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-engine-front-closed-reg-v2-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 74612,
+          "sha256": "0c3cd3ffa3a2b85b080c4719ebb17d3741bbd5ebe11d0af6bdda36c299818069",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "skyline/v2/skyline-engine-front-open-reg-v2",
+      "group": "skyline",
+      "role": "skyline-engine-open",
+      "preloadRole": "paired-reveal",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/skyline/v2/skyline-engine-front-open-reg-v2.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1617038,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-engine-front-open-reg-v2-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 178272,
+          "sha256": "7a0c3100edb0899513819860f59d0e4648e3a0fb7916623e8f3a78c122fef02f",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-engine-front-open-reg-v2-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 105204,
+          "sha256": "4f19f54b628e1b0666f542cb836884fe95eb42f971e44a6aae4d2a2598e5bba5",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "skyline/v2/skyline-headlight-macro-v2",
+      "group": "skyline",
+      "role": "skyline-headlight",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/skyline/v2/skyline-headlight-macro-v2.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1656564,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-headlight-macro-v2-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 183860,
+          "sha256": "df62a95257dc6716c3c55d6dd6e81e53da94502ce9cce5f53bc5a25afdb2f52b",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-headlight-macro-v2-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 104980,
+          "sha256": "8f719e5ec644d84179a7766e30270e824403b4acce45d5c187ead108ee28d01b",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "skyline/v2/skyline-hero-rear-three-quarter-v2",
+      "group": "skyline",
+      "role": "skyline-intro-hero",
+      "preloadRole": "chapter-entry",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/skyline/v2/skyline-hero-rear-three-quarter-v2.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1662630,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-hero-rear-three-quarter-v2-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 164482,
+          "sha256": "7e94b0b3d2110e9681c085049f8bf067ed66fb17eafe98ab2d3b101cd9e36b41",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-hero-rear-three-quarter-v2-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 87566,
+          "sha256": "5e8ddf8274d4ae56f35451244b75123111855fcff23a6b287595f5e743b967f3",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "skyline/v2/skyline-side-profile-v2",
+      "group": "skyline",
+      "role": "skyline-side-profile",
+      "preloadRole": "near-shot",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/skyline/v2/skyline-side-profile-v2.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1468052,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-side-profile-v2-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 122846,
+          "sha256": "5e5d0f497c0afb76828a9cbeaa0fae35a091512fffd7e4ca99f2f59e4531cc34",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-side-profile-v2-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 64376,
+          "sha256": "56d4ecf709782c0af0c2964040f949ff1cecb6d498eb98bef3cad1daa1e29a78",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        }
+      }
+    },
+    {
+      "id": "skyline/v2/skyline-taillight-macro-v2",
+      "group": "skyline",
+      "role": "skyline-taillight-match",
+      "preloadRole": "chapter-entry",
+      "sequence": null,
+      "profile": "plate",
+      "source": "/vehicles/skyline/v2/skyline-taillight-macro-v2.png",
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceBytes": 1587102,
+      "outputs": {
+        "desktop": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-taillight-macro-v2-desktop.webp",
+          "width": 2560,
+          "height": 1441,
+          "bytes": 203638,
+          "sha256": "055a01c8faf60f2e81670e1ed9fcd8f3c55c3cd440c37cc04c0e3ca2571cd795",
+          "artDirectedCrop": null,
+          "profile": "plate"
+        },
+        "mobile": {
+          "src": "/vehicles/optimized/skyline/v2/skyline-taillight-macro-v2-mobile.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 108874,
+          "sha256": "752f8d77df5dfb9c671e953a5bfc33effb7eb72dfcb33de3495f22a1e97ed842",
+          "artDirectedCrop": null,
+          "profile": "plate"
         }
       }
     }

@@ -1,6 +1,6 @@
 # Asset license ledger
 
-The motion system, masks, typography treatments, and SVG placeholders are original to this repository. The photographic and music-world images were supplied by the site owner; their original sources and public-web permissions have not yet been documented, so they are approved for private prototype use only.
+The motion system, typography treatments, SVG placeholders, and generated effect studies are original to this repository. Owner-supplied reference images remain outside the production pipeline; their original sources and public-web permissions have not been documented, so they are approved for private reference use only.
 
 | Asset | Source | License / permission | Status |
 | --- | --- | --- | --- |
@@ -9,6 +9,10 @@ The motion system, masks, typography treatments, and SVG placeholders are origin
 | Newsreader Variable | Fontsource package | SIL Open Font License 1.1 | Approved |
 | Helvetica Neue / Helvetica / Arial stack | Visitor system fonts; no webfont file shipped | Platform font licenses | Approved |
 | `public/vehicles/{senna,f1,skyline}/*-v1.png` | Original AI-generated temporary vehicle plates produced for this project from owner-supplied composition references | Project prototype use; generated imagery still requires final model-accuracy and trademark review | Temporary production plate |
+| `public/vehicles/senna/door-open-v2/*.png` | Original AI-generated registered door-motion studies produced for this project | Project prototype use; registration and McLaren Senna geometry require final frame-by-frame review | Temporary sequence plate |
+| `public/vehicles/f1/ferrari/*.png` | Original AI-generated Ferrari-inspired visual-development plates produced for this project | Private prototype use only; Ferrari vehicle likeness, trade dress, technical accuracy, and any implied affiliation require clearance and review before public release | Temporary production plate |
+| `public/vehicles/skyline/v2/*.png` | Original AI-generated Skyline R34-inspired visual-development plates produced for this project | Private prototype use only; Nissan/Skyline vehicle likeness and mechanical accuracy require clearance and review before public release | Temporary production plate |
+| `public/vehicles/effects/skyline-engine-{ink-mask,depth}-v1.png` | Original AI-generated transition mask and approximate depth study derived from the project-bound Skyline engine plate | Project prototype use; depth is an artistic approximation and is not geometrically certified | Temporary effect asset |
 | `public/vehicles/optimized/**` | Deterministic WebP derivatives of the original temporary plates | Same status as source plate | Temporary production plate |
 | `.reference-archive/legacy-public-media/*` (19 images) | Supplied by site owner; removed from `public/` in the automotive redesign | Original source / license not documented; includes visible marks, brands, and artist likenesses | Local reference only — ignored by Git and excluded from deployment |
 

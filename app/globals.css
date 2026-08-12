@@ -40,6 +40,20 @@ html {
   scrollbar-width: thin;
 }
 
+html,
+body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+}
+
 html[data-menu="open"] {
   overflow: hidden;
 }
