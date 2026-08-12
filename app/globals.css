@@ -40,6 +40,16 @@ html {
   scrollbar-width: thin;
 }
 
+body:has([data-automotive-home]),
+body:has([data-automotive-home]) main {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+html:has([data-automotive-home]:not([data-intro-ready])) {
+  overflow: hidden;
+}
+
 html,
 body {
   width: 100%;

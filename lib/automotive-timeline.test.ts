@@ -52,10 +52,12 @@ describe("automotive timeline", () => {
     expect(resolveAutomotiveTimeline(1)).toMatchObject({ chapterId: "contact", shotProgress: 1 });
   });
 
-  it("maps the complete reversible McLaren door beat", () => {
-    expect(resolveChapterShot("experience", 0.675)).toMatchObject({ id: "senna-doors", progress: 0 });
-    expect(resolveChapterShot("experience", 0.775)).toMatchObject({ id: "senna-doors", progress: 0.5 });
-    expect(resolveChapterShot("experience", 0.875)).toMatchObject({ id: "senna-open", progress: 0 });
+  it("maps the door-state motion into the authentic open-door camera push", () => {
+    expect(resolveChapterShot("experience", 0.675)).toMatchObject({ id: "senna-door-motion", progress: 0 });
+    const midpoint = resolveChapterShot("experience", 0.725);
+    expect(midpoint.id).toBe("senna-door-motion");
+    expect(midpoint.progress).toBeCloseTo(0.5);
+    expect(resolveChapterShot("experience", 0.775)).toMatchObject({ id: "open-door-camera-push", progress: 0 });
   });
 
   it("is reverse-safe and history independent", () => {

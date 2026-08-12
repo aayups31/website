@@ -1,0 +1,31 @@
+{
+  "source": "Images/Mclaren/Now_do_the_same_for_these_samp.mp4",
+  "sourceSha256": "2a97f344f7a411293fb124731ebdca17353485be77689e3359731da9f55cfef8",
+  "sourceBytes": 2644043,
+  "sourceCodec": "H.264 High / yuv420p with AAC-LC stereo",
+  "sourceDimensions": {
+    "width": 1280,
+    "height": 720
+  },
+  "sourceDurationSeconds": 10.006,
+  "sourceFrameRate": 24,
+  "sourceStartFrame": 112,
+  "sourceEndFrameExclusive": 144,
+  "sourceStartSeconds": 4.666666666666667,
+  "durationSeconds": 1.3333333333333333,
+  "frameCount": 32,
+  "derivatives": {
+    "desktopFramePattern": "/vehicles/senna/video-derived/frames/desktop/frame-%03d.webp",
+    "desktopDimensions": {
+      "width": 1280,
+      "height": 720
+    },
+    "mobileFramePattern": "/vehicles/senna/video-derived/frames/mobile/frame-%03d.webp",
+    "mobileDimensions": {
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "contentNote": "The source segment contains a camera push on a fully open-door pose; it does not contain the door hinge opening from closed to open.",
+  "provenanceNote": "Owner-supplied Google-encoded reference. Visible sparkle mark and vehicle branding are retained in the extracted frames."
+}

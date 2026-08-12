@@ -15,42 +15,21 @@ export type ScrollFrameSequenceHandle = {
 
 type ScrollFrameSequenceProps = {
   className?: string;
-  desktopFrames: string[];
-  mobileFrames: string[];
+  desktopFrames: readonly string[];
+  mobileFrames: readonly string[];
   fallbackDesktop: string;
   fallbackMobile: string;
   enabled: boolean;
   poster: string;
+  sequenceLabel: string;
+  sequenceKind: "door-state-motion" | "open-door-camera-push";
+  sourceStartFrame?: number;
 };
 
 type LoadedFrame = HTMLImageElement | null;
+type LoadState = "idle" | "loading" | "ready" | "error";
 
-const DOOR_FRAME_COUNT = 10;
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
-
-function isLegacyDoorSequence(frames: string[]) {
-  return (
-    frames.length === DOOR_FRAME_COUNT &&
-    frames.some((frame) => frame.includes("/door-open-v2/"))
-  );
-}
-
-/**
- * The registered source set is intentionally numbered door-000..door-009.
- * Accept the earlier frame list shape as input so a stale cached client can
- * still resolve the current, registered sequence after deployment.
- */
-function resolveFrameSources(
-  frames: string[],
-  variant: "desktop" | "mobile",
-) {
-  if (!isLegacyDoorSequence(frames)) return frames;
-
-  return Array.from({ length: DOOR_FRAME_COUNT }, (_, index) => {
-    const frame = String(index).padStart(3, "0");
-    return `/vehicles/optimized/senna/door-open-v2/door-${frame}-${variant}.webp`;
-  });
-}
 
 function drawCover(
   context: CanvasRenderingContext2D,
@@ -87,7 +66,7 @@ function closestLoadedFrame(images: LoadedFrame[], target: number, step: -1 | 1)
   return -1;
 }
 
-function useStableFrames(frames: string[]) {
+function useStableFrames(frames: readonly string[]) {
   const framesRef = useRef(frames);
   const previous = framesRef.current;
   const unchanged =
@@ -110,6 +89,9 @@ export const ScrollFrameSequence = forwardRef<
     fallbackMobile,
     enabled,
     poster,
+    sequenceLabel,
+    sequenceKind,
+    sourceStartFrame = 0,
   },
   ref,
 ) {
@@ -140,10 +122,7 @@ export const ScrollFrameSequence = forwardRef<
   }, []);
 
   const sources = useMemo(
-    () =>
-      isMobile
-        ? resolveFrameSources(stableMobileFrames, "mobile")
-        : resolveFrameSources(stableDesktopFrames, "desktop"),
+    () => (isMobile ? stableMobileFrames : stableDesktopFrames),
     [isMobile, stableDesktopFrames, stableMobileFrames],
   );
   const fallbackSource = isMobile ? fallbackMobile : fallbackDesktop;
@@ -156,7 +135,9 @@ export const ScrollFrameSequence = forwardRef<
     const frameSources =
       enabled && sources.length > 0 ? sources : [fallbackSource || poster];
     const images: LoadedFrame[] = Array(frameSources.length).fill(null);
+    const loadStates: LoadState[] = Array(frameSources.length).fill("idle");
     let targetProgress = pendingProgressRef.current;
+    let lastRequestedProgress = Number.NaN;
     let animationFrame: number | null = null;
     let disposed = false;
 
@@ -180,7 +161,9 @@ export const ScrollFrameSequence = forwardRef<
 
       const exactFrame =
         clamp(targetProgress) * Math.max(0, frameSources.length - 1);
-      canvas.dataset.frame = String(Math.round(exactFrame));
+      const displayFrame = Math.round(exactFrame);
+      canvas.dataset.frame = String(displayFrame);
+      canvas.dataset.sourceFrame = String(sourceStartFrame + displayFrame);
       const lower = closestLoadedFrame(images, Math.floor(exactFrame), -1);
       const upper = closestLoadedFrame(images, Math.ceil(exactFrame), 1);
 
@@ -212,11 +195,17 @@ export const ScrollFrameSequence = forwardRef<
     }
 
     const load = (
-      source: string,
       index: number,
       priority: "high" | "auto",
-      allowFallback = true,
+      sourceOverride?: string,
     ) => {
+      if (index < 0 || index >= frameSources.length || disposed) return;
+      if (!sourceOverride && loadStates[index] !== "idle") return;
+
+      const source =
+        sourceOverride || frameSources[index] || fallbackSource || poster;
+      if (!source) return;
+      loadStates[index] = "loading";
       const image = new Image();
       image.decoding = "async";
       image.fetchPriority = priority;
@@ -227,36 +216,66 @@ export const ScrollFrameSequence = forwardRef<
           .finally(() => {
             if (disposed) return;
             images[index] = image;
+            loadStates[index] = "ready";
             schedule();
           });
       };
       image.onerror = () => {
-        const alternate =
-          source !== fallbackSource && fallbackSource
-            ? fallbackSource
-            : source !== poster
-              ? poster
-              : "";
-        if (!disposed && allowFallback && index === 0 && alternate) {
-          load(alternate, index, "high", false);
+        if (disposed) return;
+        loadStates[index] = "error";
+        const alternate = source !== fallbackSource ? fallbackSource : poster;
+        if (index === 0 && alternate && alternate !== source) {
+          loadStates[index] = "idle";
+          load(index, "high", alternate);
         }
       };
       image.src = source;
     };
 
+    const primeTarget = (progress: number) => {
+      const exact = clamp(progress) * Math.max(0, frameSources.length - 1);
+      const target = Math.round(exact);
+      const nearby = [
+        target,
+        Math.floor(exact),
+        Math.ceil(exact),
+        target - 1,
+        target + 1,
+        target - 2,
+        target + 2,
+        target - 3,
+        target + 3,
+        target - 4,
+        target + 4,
+      ];
+      nearby.forEach((index, order) => load(index, order < 3 ? "high" : "auto"));
+
+      images.forEach((image, index) => {
+        if (!image || index === 0 || Math.abs(index - target) <= 7) return;
+        images[index] = null;
+        if (loadStates[index] === "ready") loadStates[index] = "idle";
+      });
+    };
+
     updateRef.current = (progress) => {
       targetProgress = clamp(Number.isFinite(progress) ? progress : 0);
+      if (
+        Number.isFinite(lastRequestedProgress) &&
+        Math.abs(targetProgress - lastRequestedProgress) < 0.0001
+      ) {
+        return;
+      }
+      lastRequestedProgress = targetProgress;
+      primeTarget(targetProgress);
       schedule();
     };
 
     updateRef.current(pendingProgressRef.current);
 
     resize();
-    // The first registered frame is the canonical poster. The explicit
-    // fallback remains useful when motion is disabled or only one frame is used.
-    frameSources.forEach((source, index) => {
-      load(source || fallbackSource || poster, index, index < 2 ? "high" : "auto");
-    });
+    // Decode only the current scrub neighborhood. This preserves sub-frame
+    // blending without retaining every full-screen source frame in memory.
+    primeTarget(pendingProgressRef.current);
     schedule();
 
     const observer = new ResizeObserver(schedule);
@@ -271,13 +290,16 @@ export const ScrollFrameSequence = forwardRef<
       updateRef.current = () => undefined;
       images.fill(null);
     };
-  }, [enabled, fallbackSource, poster, sources]);
+  }, [enabled, fallbackSource, poster, sourceStartFrame, sources]);
 
   return (
     <canvas
       ref={canvasRef}
       className={className}
       data-door-sequence
+      data-scroll-frame-sequence
+      data-sequence-kind={sequenceKind}
+      data-sequence-label={sequenceLabel}
       data-poster={poster}
       aria-hidden="true"
     />

@@ -8,16 +8,14 @@ export type AutomotiveChapterId =
 export type AutomotiveShotId =
   | "identity"
   | "skyline-hero"
-  | "engine-closed"
-  | "engine-reveal"
-  | "engine-model"
+  | "engine-inspection"
   | "skyline-handoff"
   | "senna-carbon"
   | "senna-wheel"
   | "senna-exhaust"
   | "senna-settle"
-  | "senna-doors"
-  | "senna-open"
+  | "senna-door-motion"
+  | "open-door-camera-push"
   | "tyre-match"
   | "ferrari-controls"
   | "ferrari-suspension"
@@ -47,8 +45,8 @@ export const AUTOMOTIVE_EDIT = Object.freeze({
   experienceEnd: 136,
   projectsEnd: 224,
   creativeEnd: 266,
-  engineModelStart: 44.5,
-  engineModelEnd: 54.8,
+  engineInspectionStart: 29.2,
+  engineInspectionEnd: 54.8,
   doorStart: 110,
   doorEnd: 126,
 });
@@ -71,9 +69,7 @@ export const AUTOMOTIVE_SHOTS: Readonly<
   about: [
     { id: "identity", start: 0, end: 0.25 },
     { id: "skyline-hero", start: 0.25, end: 0.5214 },
-    { id: "engine-closed", start: 0.5214, end: 0.625 },
-    { id: "engine-reveal", start: 0.625, end: 0.7946 },
-    { id: "engine-model", start: 0.7946, end: 0.9786 },
+    { id: "engine-inspection", start: 0.5214, end: 0.9786 },
     { id: "skyline-handoff", start: 0.9786, end: 1 },
   ],
   experience: [
@@ -81,8 +77,8 @@ export const AUTOMOTIVE_SHOTS: Readonly<
     { id: "senna-wheel", start: 0.15, end: 0.3563 },
     { id: "senna-exhaust", start: 0.3563, end: 0.5625 },
     { id: "senna-settle", start: 0.5625, end: 0.675 },
-    { id: "senna-doors", start: 0.675, end: 0.875 },
-    { id: "senna-open", start: 0.875, end: 0.925 },
+    { id: "senna-door-motion", start: 0.675, end: 0.775 },
+    { id: "open-door-camera-push", start: 0.775, end: 0.925 },
     { id: "tyre-match", start: 0.925, end: 1 },
   ],
   projects: [

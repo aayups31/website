@@ -1,0 +1,1180 @@
+{
+  "schemaVersion": 1,
+  "asset": "McLaren Senna registered door-opening scroll sequence",
+  "generator": "scripts/interpolate-senna-door-frames.py",
+  "opencvVersion": "4.11.0",
+  "algorithm": {
+    "name": "DeepFlow",
+    "implementation": "cv2.optflow.createOptFlow_DeepFlow",
+    "flowResolution": "full source resolution",
+    "direction": "bidirectional",
+    "synthesis": "cubic inverse-remap of both endpoints with temporal weighting",
+    "intermediateFramesPerPair": 3,
+    "webpQuality": 82
+  },
+  "input": {
+    "root": "public/vehicles/optimized/senna/door-open-v2",
+    "pattern": "door-{000..009}-{desktop|mobile}.webp",
+    "stateCount": 10
+  },
+  "output": {
+    "root": "public/vehicles/optimized/senna/door-motion-flow-v1",
+    "pattern": "{desktop|mobile}/frame-{000..036}.webp",
+    "frameCountPerVariant": 37,
+    "originalFrameStride": 4
+  },
+  "variants": {
+    "desktop": {
+      "width": 1920,
+      "height": 1081,
+      "sourceFrames": [
+        {
+          "index": 0,
+          "file": "door-000-desktop.webp",
+          "bytes": 89608,
+          "sha256": "fecaafc36d1a298951338c13245e4d7b51021148234677e4d97a27077d1133c8"
+        },
+        {
+          "index": 1,
+          "file": "door-001-desktop.webp",
+          "bytes": 94488,
+          "sha256": "23665964bacbc1a647fad5117f63fef2cad3d64b3303d6dfbceabefbaebdabef"
+        },
+        {
+          "index": 2,
+          "file": "door-002-desktop.webp",
+          "bytes": 94232,
+          "sha256": "67d7aab5b665d9e0864bd9770addc7588ddcf45dd6fc4eebc2563e6bdad35f85"
+        },
+        {
+          "index": 3,
+          "file": "door-003-desktop.webp",
+          "bytes": 94722,
+          "sha256": "365619bb8bb1cbd844535d4bb876d2b57e10c6882b73753dc073c067c3acc720"
+        },
+        {
+          "index": 4,
+          "file": "door-004-desktop.webp",
+          "bytes": 97110,
+          "sha256": "b33d99d82332ad2592460f45e55260610b40b5507bd6b30bc61cc4cba4d62a7a"
+        },
+        {
+          "index": 5,
+          "file": "door-005-desktop.webp",
+          "bytes": 92832,
+          "sha256": "2c0fb3dacf6f16cfa7070e7c029c496c7c8908115d98a62de2c7b40c29b10713"
+        },
+        {
+          "index": 6,
+          "file": "door-006-desktop.webp",
+          "bytes": 92032,
+          "sha256": "20d83a32aadd0dca3936661cc65b9882d4ded25b99bdddb975e44edcf024b7b2"
+        },
+        {
+          "index": 7,
+          "file": "door-007-desktop.webp",
+          "bytes": 97454,
+          "sha256": "053479e997347ec8e437c40b864d6c21d5032691b38d83ebb9085e1140b99d4a"
+        },
+        {
+          "index": 8,
+          "file": "door-008-desktop.webp",
+          "bytes": 100336,
+          "sha256": "26f51a27a1341886f3eaf93fdfa60b90fd70a5dee268efd3693ae3fe299b097c"
+        },
+        {
+          "index": 9,
+          "file": "door-009-desktop.webp",
+          "bytes": 102368,
+          "sha256": "03221e21f94cc70737277f3faba5a3b92222ed148ac476de063d5e6bc3dabadd"
+        }
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "desktop/frame-000.webp",
+          "sourceIndices": [
+            0
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 89608,
+          "sha256": "fecaafc36d1a298951338c13245e4d7b51021148234677e4d97a27077d1133c8"
+        },
+        {
+          "index": 1,
+          "file": "desktop/frame-001.webp",
+          "sourceIndices": [
+            0,
+            1
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 88218,
+          "sha256": "b705e10e7ed69b1221371901a9f7eb31290a3e3f15121cb598524f406ea61554"
+        },
+        {
+          "index": 2,
+          "file": "desktop/frame-002.webp",
+          "sourceIndices": [
+            0,
+            1
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 89832,
+          "sha256": "bdf464995709885bb9acf1f917984662e5e65da73c87dd77cb2374d92b5949f9"
+        },
+        {
+          "index": 3,
+          "file": "desktop/frame-003.webp",
+          "sourceIndices": [
+            0,
+            1
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 90788,
+          "sha256": "c6eb63256793e1eeb84fe7f9d181dc5794e78c4314ce4e4b076d5b765502ab98"
+        },
+        {
+          "index": 4,
+          "file": "desktop/frame-004.webp",
+          "sourceIndices": [
+            1
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 94488,
+          "sha256": "23665964bacbc1a647fad5117f63fef2cad3d64b3303d6dfbceabefbaebdabef"
+        },
+        {
+          "index": 5,
+          "file": "desktop/frame-005.webp",
+          "sourceIndices": [
+            1,
+            2
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 90888,
+          "sha256": "c823bbc46e9f40b64d56a6cc651040a735f144eb5f72e1516d2b6c6b10f05f02"
+        },
+        {
+          "index": 6,
+          "file": "desktop/frame-006.webp",
+          "sourceIndices": [
+            1,
+            2
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 91296,
+          "sha256": "5784a4855bfb24e341ac8a876db9379c1c851acdd392e16e6022f53ec7db2014"
+        },
+        {
+          "index": 7,
+          "file": "desktop/frame-007.webp",
+          "sourceIndices": [
+            1,
+            2
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 90772,
+          "sha256": "197b42b636e6440390a5520daefd5c29bc13238355399c91e45ef5419a4a4fa0"
+        },
+        {
+          "index": 8,
+          "file": "desktop/frame-008.webp",
+          "sourceIndices": [
+            2
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 94232,
+          "sha256": "67d7aab5b665d9e0864bd9770addc7588ddcf45dd6fc4eebc2563e6bdad35f85"
+        },
+        {
+          "index": 9,
+          "file": "desktop/frame-009.webp",
+          "sourceIndices": [
+            2,
+            3
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 92024,
+          "sha256": "8542c8b2a7aa7d28dbaa581adaa9b814007b9a4a6f7b8def5f4efc259c0d811f"
+        },
+        {
+          "index": 10,
+          "file": "desktop/frame-010.webp",
+          "sourceIndices": [
+            2,
+            3
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 91282,
+          "sha256": "53594c46bb882bf693a1e75a1f2b48e4bc51f3c140427ad1e553d9fe74b179e6"
+        },
+        {
+          "index": 11,
+          "file": "desktop/frame-011.webp",
+          "sourceIndices": [
+            2,
+            3
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 91050,
+          "sha256": "457ba40d3f1785a3b0a2ed4f277925eac900700bf8b6826795a3cd80b1a7ff89"
+        },
+        {
+          "index": 12,
+          "file": "desktop/frame-012.webp",
+          "sourceIndices": [
+            3
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 94722,
+          "sha256": "365619bb8bb1cbd844535d4bb876d2b57e10c6882b73753dc073c067c3acc720"
+        },
+        {
+          "index": 13,
+          "file": "desktop/frame-013.webp",
+          "sourceIndices": [
+            3,
+            4
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 92792,
+          "sha256": "a052d628b7fe0e742cee1b74b142bca3ce9fde62b1649e1547852bf24c04f96c"
+        },
+        {
+          "index": 14,
+          "file": "desktop/frame-014.webp",
+          "sourceIndices": [
+            3,
+            4
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 93184,
+          "sha256": "b23557bcc8ff80717d2a843f707598ce149d92f1ff6db90efa29c824325e756d"
+        },
+        {
+          "index": 15,
+          "file": "desktop/frame-015.webp",
+          "sourceIndices": [
+            3,
+            4
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 94720,
+          "sha256": "be67bdfb2d4da30cbd7cd6ed04470d57abe4932114c05f3bbaf8f8d0b4c4cfd4"
+        },
+        {
+          "index": 16,
+          "file": "desktop/frame-016.webp",
+          "sourceIndices": [
+            4
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 97110,
+          "sha256": "b33d99d82332ad2592460f45e55260610b40b5507bd6b30bc61cc4cba4d62a7a"
+        },
+        {
+          "index": 17,
+          "file": "desktop/frame-017.webp",
+          "sourceIndices": [
+            4,
+            5
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 92612,
+          "sha256": "1ab876f0b5c042546c08e8f6a47a0f16d0701a253025d6d7ea0ee253a5fbe76c"
+        },
+        {
+          "index": 18,
+          "file": "desktop/frame-018.webp",
+          "sourceIndices": [
+            4,
+            5
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 91144,
+          "sha256": "0f82bedbca9e3ec662a6e756f4331c3eeb0e8fdb397f6115659ecc3b93a5a444"
+        },
+        {
+          "index": 19,
+          "file": "desktop/frame-019.webp",
+          "sourceIndices": [
+            4,
+            5
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 90602,
+          "sha256": "237f1a2c14036706966a7d884c1b9da0034e1a9260837c8efe1f6d6ee7b89068"
+        },
+        {
+          "index": 20,
+          "file": "desktop/frame-020.webp",
+          "sourceIndices": [
+            5
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 92832,
+          "sha256": "2c0fb3dacf6f16cfa7070e7c029c496c7c8908115d98a62de2c7b40c29b10713"
+        },
+        {
+          "index": 21,
+          "file": "desktop/frame-021.webp",
+          "sourceIndices": [
+            5,
+            6
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 89268,
+          "sha256": "e16f9a10394b9bf546bb77108ae24fcc028a1ea8e7a6a934a8cab1e32a3f70a1"
+        },
+        {
+          "index": 22,
+          "file": "desktop/frame-022.webp",
+          "sourceIndices": [
+            5,
+            6
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 89052,
+          "sha256": "2a5a20a4611c2c1f7a9cdcd80910e4ad519fffd99df3744dfefcbd2ba0a467bc"
+        },
+        {
+          "index": 23,
+          "file": "desktop/frame-023.webp",
+          "sourceIndices": [
+            5,
+            6
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 88844,
+          "sha256": "04b60efcf5a0e3ba317409d6e5645c4ef2b3203347c1209d6fe465f0a865c678"
+        },
+        {
+          "index": 24,
+          "file": "desktop/frame-024.webp",
+          "sourceIndices": [
+            6
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 92032,
+          "sha256": "20d83a32aadd0dca3936661cc65b9882d4ded25b99bdddb975e44edcf024b7b2"
+        },
+        {
+          "index": 25,
+          "file": "desktop/frame-025.webp",
+          "sourceIndices": [
+            6,
+            7
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 89072,
+          "sha256": "07283578e7cd44ac0bdc4ac5c30dba89aea8f065b59c587042fe182996e42863"
+        },
+        {
+          "index": 26,
+          "file": "desktop/frame-026.webp",
+          "sourceIndices": [
+            6,
+            7
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 90152,
+          "sha256": "2bf6cf0be4e997d9dc4048f3f2be08941d9115bcfb3d12208ccd1f1a939642ad"
+        },
+        {
+          "index": 27,
+          "file": "desktop/frame-027.webp",
+          "sourceIndices": [
+            6,
+            7
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 93102,
+          "sha256": "f883a9893e2929953d54749162cbf50e6f5168953058927cb5e1c545be1c801d"
+        },
+        {
+          "index": 28,
+          "file": "desktop/frame-028.webp",
+          "sourceIndices": [
+            7
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 97454,
+          "sha256": "053479e997347ec8e437c40b864d6c21d5032691b38d83ebb9085e1140b99d4a"
+        },
+        {
+          "index": 29,
+          "file": "desktop/frame-029.webp",
+          "sourceIndices": [
+            7,
+            8
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 94034,
+          "sha256": "4c4b823e61a1e6bf3f92bad7ff53b82f8da8b52af71c4831bd065b0b03271077"
+        },
+        {
+          "index": 30,
+          "file": "desktop/frame-030.webp",
+          "sourceIndices": [
+            7,
+            8
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 94822,
+          "sha256": "a82baf4a1695f37f0d0535507193460a1843fd2b1e21968cb5260e2459fd1036"
+        },
+        {
+          "index": 31,
+          "file": "desktop/frame-031.webp",
+          "sourceIndices": [
+            7,
+            8
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 96408,
+          "sha256": "0dcf27b009189fe0b335ce92d02e0fc68e0f7fe8acdb567933d4bdef99294e50"
+        },
+        {
+          "index": 32,
+          "file": "desktop/frame-032.webp",
+          "sourceIndices": [
+            8
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 100336,
+          "sha256": "26f51a27a1341886f3eaf93fdfa60b90fd70a5dee268efd3693ae3fe299b097c"
+        },
+        {
+          "index": 33,
+          "file": "desktop/frame-033.webp",
+          "sourceIndices": [
+            8,
+            9
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 97594,
+          "sha256": "d6ac3cfc2de000d75e502c317b6cdbe1648a657d4337aea66a934642894543e7"
+        },
+        {
+          "index": 34,
+          "file": "desktop/frame-034.webp",
+          "sourceIndices": [
+            8,
+            9
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 97848,
+          "sha256": "b3252b8618319c311c2dfe35b9cae1713b75a4e89b65e37b3e70cfe2c9b0b424"
+        },
+        {
+          "index": 35,
+          "file": "desktop/frame-035.webp",
+          "sourceIndices": [
+            8,
+            9
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 98532,
+          "sha256": "cac78e3a090aceeb187c081a1c1b4be60a3cedf4dd0f6d30ebe4213e7e2e01d6"
+        },
+        {
+          "index": 36,
+          "file": "desktop/frame-036.webp",
+          "sourceIndices": [
+            9
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1920,
+          "height": 1081,
+          "bytes": 102368,
+          "sha256": "03221e21f94cc70737277f3faba5a3b92222ed148ac476de063d5e6bc3dabadd"
+        }
+      ]
+    },
+    "mobile": {
+      "width": 1280,
+      "height": 720,
+      "sourceFrames": [
+        {
+          "index": 0,
+          "file": "door-000-mobile.webp",
+          "bytes": 54072,
+          "sha256": "2055cac11d4b85f51be5e2330ac8d5bc543cae5be7c07e821b3e304371b6925e"
+        },
+        {
+          "index": 1,
+          "file": "door-001-mobile.webp",
+          "bytes": 57646,
+          "sha256": "fc6a6d5f9a6c512a6285c476829308014d03f337053df64c72fa64d9e5be7432"
+        },
+        {
+          "index": 2,
+          "file": "door-002-mobile.webp",
+          "bytes": 57960,
+          "sha256": "a5e1b7757b80286b392f0747ae3e141f8d48996bef294a784f8dcd9e3ee6277c"
+        },
+        {
+          "index": 3,
+          "file": "door-003-mobile.webp",
+          "bytes": 57526,
+          "sha256": "65306f55dc696c35b98ce2900853a08cb1b9aa7da08b6407d90b82679ec5f689"
+        },
+        {
+          "index": 4,
+          "file": "door-004-mobile.webp",
+          "bytes": 59856,
+          "sha256": "f426d1fb3d1779b2ee9d5c6331db069d6af97071c6b7c1b4c0c9968c645e5eaf"
+        },
+        {
+          "index": 5,
+          "file": "door-005-mobile.webp",
+          "bytes": 57678,
+          "sha256": "09806717cb7ec30bed59eac6ad9cc3e4ca44f715946969beb69e6449b191e0c4"
+        },
+        {
+          "index": 6,
+          "file": "door-006-mobile.webp",
+          "bytes": 57542,
+          "sha256": "9b6cf04e325a23d6a6006d064f2677a2fbdfa1d9130d288f7987bed8b6fff94e"
+        },
+        {
+          "index": 7,
+          "file": "door-007-mobile.webp",
+          "bytes": 60668,
+          "sha256": "fb8fd409c0c7ba05aec388ef46a31ff8f8e6ee2e6a5e80732ad3a5fb97f8e108"
+        },
+        {
+          "index": 8,
+          "file": "door-008-mobile.webp",
+          "bytes": 61420,
+          "sha256": "087b1e0177a0867bda1e2bd2c05e3f93529a9d78058f5624f3b7656c9886b13f"
+        },
+        {
+          "index": 9,
+          "file": "door-009-mobile.webp",
+          "bytes": 62212,
+          "sha256": "579e276b76f593ca1344679ef50c62cc606afb4fcf58f48e7af74562e94cbe2c"
+        }
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "file": "mobile/frame-000.webp",
+          "sourceIndices": [
+            0
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54072,
+          "sha256": "2055cac11d4b85f51be5e2330ac8d5bc543cae5be7c07e821b3e304371b6925e"
+        },
+        {
+          "index": 1,
+          "file": "mobile/frame-001.webp",
+          "sourceIndices": [
+            0,
+            1
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 52696,
+          "sha256": "e17304ce61f548fd34dae435eb3fb8a78ea876c3736fec13f186e52e3bccf47e"
+        },
+        {
+          "index": 2,
+          "file": "mobile/frame-002.webp",
+          "sourceIndices": [
+            0,
+            1
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 53384,
+          "sha256": "d84bc63d436518522317cf9ba73a616643f8bc54189b6d243e4ab3dd98d59a87"
+        },
+        {
+          "index": 3,
+          "file": "mobile/frame-003.webp",
+          "sourceIndices": [
+            0,
+            1
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54268,
+          "sha256": "a845d0696840255bc9268d50e09d6b8f80cafb413f70a79a51749abc49d372eb"
+        },
+        {
+          "index": 4,
+          "file": "mobile/frame-004.webp",
+          "sourceIndices": [
+            1
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 57646,
+          "sha256": "fc6a6d5f9a6c512a6285c476829308014d03f337053df64c72fa64d9e5be7432"
+        },
+        {
+          "index": 5,
+          "file": "mobile/frame-005.webp",
+          "sourceIndices": [
+            1,
+            2
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54758,
+          "sha256": "9d04b5577a4252ca636aa4920919ef0066098734a1a08510420588c6b9628c46"
+        },
+        {
+          "index": 6,
+          "file": "mobile/frame-006.webp",
+          "sourceIndices": [
+            1,
+            2
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54822,
+          "sha256": "b1e839d5af7041c2d28eb7c6f2d834bac7e1eaee9aad4b7227fd5d955337c2b2"
+        },
+        {
+          "index": 7,
+          "file": "mobile/frame-007.webp",
+          "sourceIndices": [
+            1,
+            2
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54676,
+          "sha256": "ef360a065970a6ab621abb7ed4550babb2d5f01262af3753e6449c6dd56b01ca"
+        },
+        {
+          "index": 8,
+          "file": "mobile/frame-008.webp",
+          "sourceIndices": [
+            2
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 57960,
+          "sha256": "a5e1b7757b80286b392f0747ae3e141f8d48996bef294a784f8dcd9e3ee6277c"
+        },
+        {
+          "index": 9,
+          "file": "mobile/frame-009.webp",
+          "sourceIndices": [
+            2,
+            3
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54816,
+          "sha256": "c9413ac1cd852957f57311305aae3ecaf20fec9589962ec91aabdda42cd7cf41"
+        },
+        {
+          "index": 10,
+          "file": "mobile/frame-010.webp",
+          "sourceIndices": [
+            2,
+            3
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54656,
+          "sha256": "f10ed5e5a79e7cf9355e71d905d617808810ba3dbd23a7b92eb8f66fb8d037ef"
+        },
+        {
+          "index": 11,
+          "file": "mobile/frame-011.webp",
+          "sourceIndices": [
+            2,
+            3
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54832,
+          "sha256": "d73f4637a6e5dadf917dc64eb1ef591252d65cb60c915432062105737585afc2"
+        },
+        {
+          "index": 12,
+          "file": "mobile/frame-012.webp",
+          "sourceIndices": [
+            3
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 57526,
+          "sha256": "65306f55dc696c35b98ce2900853a08cb1b9aa7da08b6407d90b82679ec5f689"
+        },
+        {
+          "index": 13,
+          "file": "mobile/frame-013.webp",
+          "sourceIndices": [
+            3,
+            4
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 55402,
+          "sha256": "a76069faa326b1f22b017baf74e1063c24e28726823b5712325437e13319d691"
+        },
+        {
+          "index": 14,
+          "file": "mobile/frame-014.webp",
+          "sourceIndices": [
+            3,
+            4
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 55426,
+          "sha256": "b9a8d4546f188787b2c1f41e2d86944a7a017205ddac58e52a06ec3cc1efc1ea"
+        },
+        {
+          "index": 15,
+          "file": "mobile/frame-015.webp",
+          "sourceIndices": [
+            3,
+            4
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 56256,
+          "sha256": "06118730219f198a92f1f8d0dd8c420ba43ea0e6fa22cb016a7485423e1f33ca"
+        },
+        {
+          "index": 16,
+          "file": "mobile/frame-016.webp",
+          "sourceIndices": [
+            4
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 59856,
+          "sha256": "f426d1fb3d1779b2ee9d5c6331db069d6af97071c6b7c1b4c0c9968c645e5eaf"
+        },
+        {
+          "index": 17,
+          "file": "mobile/frame-017.webp",
+          "sourceIndices": [
+            4,
+            5
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 56126,
+          "sha256": "b12be1514a6f0410dacd427dd782bb59654126ca91e41857c6eb679fae2a28e3"
+        },
+        {
+          "index": 18,
+          "file": "mobile/frame-018.webp",
+          "sourceIndices": [
+            4,
+            5
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 55596,
+          "sha256": "8403ff368a873e15b0abcac9b45671f01c7ccf3735e08bceda560c06470ec518"
+        },
+        {
+          "index": 19,
+          "file": "mobile/frame-019.webp",
+          "sourceIndices": [
+            4,
+            5
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54958,
+          "sha256": "dec62a78403f84db1065f5bbdff8cf6fd37840ca96a3714e4b1d670d57c9e942"
+        },
+        {
+          "index": 20,
+          "file": "mobile/frame-020.webp",
+          "sourceIndices": [
+            5
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 57678,
+          "sha256": "09806717cb7ec30bed59eac6ad9cc3e4ca44f715946969beb69e6449b191e0c4"
+        },
+        {
+          "index": 21,
+          "file": "mobile/frame-021.webp",
+          "sourceIndices": [
+            5,
+            6
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54624,
+          "sha256": "055232372434e4631178274c8c1b676141ddf101771c244cc6a99b89870cdc61"
+        },
+        {
+          "index": 22,
+          "file": "mobile/frame-022.webp",
+          "sourceIndices": [
+            5,
+            6
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54282,
+          "sha256": "c0b8de1982a62b8fcdd5bfbb36e7e5eef05e5dd9e108beaa718d2b7442460ea0"
+        },
+        {
+          "index": 23,
+          "file": "mobile/frame-023.webp",
+          "sourceIndices": [
+            5,
+            6
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54186,
+          "sha256": "1d3c83c91297c6b7195466927e7e9f1972a673cafa26636e3de284d743b16054"
+        },
+        {
+          "index": 24,
+          "file": "mobile/frame-024.webp",
+          "sourceIndices": [
+            6
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 57542,
+          "sha256": "9b6cf04e325a23d6a6006d064f2677a2fbdfa1d9130d288f7987bed8b6fff94e"
+        },
+        {
+          "index": 25,
+          "file": "mobile/frame-025.webp",
+          "sourceIndices": [
+            6,
+            7
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54250,
+          "sha256": "7cf3ec2f7a279a5c3a80767b20f405c3e5a70a2d28737d4e50445aab0bedea2c"
+        },
+        {
+          "index": 26,
+          "file": "mobile/frame-026.webp",
+          "sourceIndices": [
+            6,
+            7
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 54854,
+          "sha256": "086e98f9cf15b990f1835bcb1a4cec3d7d440da9963e41ce558396f39717829e"
+        },
+        {
+          "index": 27,
+          "file": "mobile/frame-027.webp",
+          "sourceIndices": [
+            6,
+            7
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 56390,
+          "sha256": "2e9e6fc279040ca6af1797e9d73ffd4db1454a19dba872057487da0319318be1"
+        },
+        {
+          "index": 28,
+          "file": "mobile/frame-028.webp",
+          "sourceIndices": [
+            7
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 60668,
+          "sha256": "fb8fd409c0c7ba05aec388ef46a31ff8f8e6ee2e6a5e80732ad3a5fb97f8e108"
+        },
+        {
+          "index": 29,
+          "file": "mobile/frame-029.webp",
+          "sourceIndices": [
+            7,
+            8
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 56776,
+          "sha256": "8e7e693395a6f00531697cf84d29c1bbbc4d44e997a99b806480f0ac45f78f2d"
+        },
+        {
+          "index": 30,
+          "file": "mobile/frame-030.webp",
+          "sourceIndices": [
+            7,
+            8
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 57104,
+          "sha256": "8ae28cf28720e71d03c5e4e76f4cf098710b7214ae7fa99af41daa401e5f9a07"
+        },
+        {
+          "index": 31,
+          "file": "mobile/frame-031.webp",
+          "sourceIndices": [
+            7,
+            8
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 57402,
+          "sha256": "60cdaf7ad97dbd963d9d34ac0f56a8ab57a50654c2160382acdbe82faed66a6f"
+        },
+        {
+          "index": 32,
+          "file": "mobile/frame-032.webp",
+          "sourceIndices": [
+            8
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 61420,
+          "sha256": "087b1e0177a0867bda1e2bd2c05e3f93529a9d78058f5624f3b7656c9886b13f"
+        },
+        {
+          "index": 33,
+          "file": "mobile/frame-033.webp",
+          "sourceIndices": [
+            8,
+            9
+          ],
+          "t": 0.25,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 58048,
+          "sha256": "14eeada831564b8a2958c30f7efe0f326007522fe8c6af1c87eb16461b26c50f"
+        },
+        {
+          "index": 34,
+          "file": "mobile/frame-034.webp",
+          "sourceIndices": [
+            8,
+            9
+          ],
+          "t": 0.5,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 58006,
+          "sha256": "6a4cf6cb3bf5bc67460f3c1a2da80e99bf0479a1e2bebabd423076a4dd105c97"
+        },
+        {
+          "index": 35,
+          "file": "mobile/frame-035.webp",
+          "sourceIndices": [
+            8,
+            9
+          ],
+          "t": 0.75,
+          "original": false,
+          "width": 1280,
+          "height": 720,
+          "bytes": 58592,
+          "sha256": "0883ad530193d7ec920169691a65e66fab2d56e748a721464d5558025a681b65"
+        },
+        {
+          "index": 36,
+          "file": "mobile/frame-036.webp",
+          "sourceIndices": [
+            9
+          ],
+          "t": 0.0,
+          "original": true,
+          "width": 1280,
+          "height": 720,
+          "bytes": 62212,
+          "sha256": "579e276b76f593ca1344679ef50c62cc606afb4fcf58f48e7af74562e94cbe2c"
+        }
+      ]
+    }
+  }
+}

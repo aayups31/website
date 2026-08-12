@@ -81,34 +81,36 @@ async function horizontalOverflow(page: Page) {
 }
 
 async function doorCanvasSignature(page: Page) {
-  return page.locator("canvas[data-door-sequence]").evaluate((element) => {
-    if (!(element instanceof HTMLCanvasElement) || element.width < 2 || element.height < 2) {
-      return null;
-    }
-
-    const sample = document.createElement("canvas");
-    sample.width = 24;
-    sample.height = 14;
-    const context = sample.getContext("2d", { willReadFrequently: true });
-    if (!context) return null;
-    context.drawImage(element, 0, 0, sample.width, sample.height);
-    const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
-    let hash = 2166136261;
-    let minimum = 255;
-    let maximum = 0;
-
-    for (let index = 0; index < pixels.length; index += 4) {
-      for (let channel = 0; channel < 3; channel += 1) {
-        const value = pixels[index + channel];
-        minimum = Math.min(minimum, value);
-        maximum = Math.max(maximum, value);
-        hash ^= value;
-        hash = Math.imul(hash, 16777619);
+  return page
+    .locator('canvas[data-door-sequence][data-sequence-kind="open-door-camera-push"]')
+    .evaluate((element) => {
+      if (!(element instanceof HTMLCanvasElement) || element.width < 2 || element.height < 2) {
+        return null;
       }
-    }
 
-    return maximum - minimum > 8 ? String(hash >>> 0) : null;
-  });
+      const sample = document.createElement("canvas");
+      sample.width = 24;
+      sample.height = 14;
+      const context = sample.getContext("2d", { willReadFrequently: true });
+      if (!context) return null;
+      context.drawImage(element, 0, 0, sample.width, sample.height);
+      const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
+      let hash = 2166136261;
+      let minimum = 255;
+      let maximum = 0;
+
+      for (let index = 0; index < pixels.length; index += 4) {
+        for (let channel = 0; channel < 3; channel += 1) {
+          const value = pixels[index + channel];
+          minimum = Math.min(minimum, value);
+          maximum = Math.max(maximum, value);
+          hash ^= value;
+          hash = Math.imul(hash, 16777619);
+        }
+      }
+
+      return maximum - minimum > 8 ? String(hash >>> 0) : null;
+    });
 }
 
 test.describe("automotive portfolio", () => {
@@ -119,8 +121,8 @@ test.describe("automotive portfolio", () => {
       experienceEnd: 136,
       projectsEnd: 224,
       creativeEnd: 266,
-      engineModelStart: 44.5,
-      engineModelEnd: 54.8,
+      engineInspectionStart: 29.2,
+      engineInspectionEnd: 54.8,
       doorStart: 110,
       doorEnd: 126,
     });
@@ -241,8 +243,9 @@ test.describe("automotive portfolio", () => {
     });
 
     await expect(page.locator("canvas")).toHaveCount(2);
-    await expect(page.locator('canvas[data-engine-model][aria-hidden="true"]')).toHaveCount(1);
-    await expect(page.locator('canvas[data-door-sequence][aria-hidden="true"]')).toHaveCount(1);
+    await expect(page.locator('canvas[data-door-sequence][data-sequence-kind="door-state-motion"][aria-hidden="true"]')).toHaveCount(1);
+    await expect(page.locator('canvas[data-door-sequence][data-sequence-kind="open-door-camera-push"][aria-hidden="true"]')).toHaveCount(1);
+    await expect(page.locator('[data-engine-model]')).toHaveCount(0);
     await expect(page.locator("video")).toHaveCount(0);
     await expect(page.locator("[autoplay]")).toHaveCount(0);
     await expect
@@ -299,15 +302,15 @@ test.describe("automotive portfolio", () => {
     const checkpoints = [
       { unit: 0, chapter: "about", shot: "identity" },
       {
-        unit: (AUTOMOTIVE_EDIT.engineModelStart + AUTOMOTIVE_EDIT.engineModelEnd) / 2,
+        unit: (AUTOMOTIVE_EDIT.engineInspectionStart + AUTOMOTIVE_EDIT.engineInspectionEnd) / 2,
         chapter: "about",
-        shot: "engine-model",
+        shot: "engine-inspection",
       },
       { unit: AUTOMOTIVE_EDIT.aboutEnd + 1, chapter: "experience", shot: "senna-carbon" },
       {
-        unit: (AUTOMOTIVE_EDIT.doorStart + AUTOMOTIVE_EDIT.doorEnd) / 2,
+        unit: (AUTOMOTIVE_EDIT.doorStart + AUTOMOTIVE_EDIT.doorEnd) / 2 + 1,
         chapter: "experience",
-        shot: "senna-doors",
+        shot: "open-door-camera-push",
       },
       { unit: AUTOMOTIVE_EDIT.experienceEnd + 1, chapter: "projects", shot: "tyre-match" },
       { unit: AUTOMOTIVE_EDIT.experienceEnd + 44, chapter: "projects", shot: "ferrari-suspension" },
@@ -351,10 +354,10 @@ test.describe("automotive portfolio", () => {
     const home = page.locator("[data-automotive-home]");
     await expect(home).toHaveAttribute("data-ready", "true");
 
-    const door = page.locator("canvas[data-door-sequence]");
+    const door = page.locator('canvas[data-door-sequence][data-sequence-kind="open-door-camera-push"]');
     await setAutomotiveProgress(page, editProgress(AUTOMOTIVE_EDIT.doorEnd + 0.25));
-    await expectTimelineState(page, home, "experience", "senna-open");
-    await expect(door).toHaveAttribute("data-frame", "9");
+    await expectTimelineState(page, home, "experience", "open-door-camera-push");
+    await expect(door).toHaveAttribute("data-frame", "31");
     await expect.poll(() => doorCanvasSignature(page), { timeout: 20_000 }).not.toBeNull();
     const openSignature = await doorCanvasSignature(page);
     expect(openSignature).not.toBeNull();
@@ -365,7 +368,7 @@ test.describe("automotive portfolio", () => {
     expect(closedSignature).not.toBeNull();
 
     await setAutomotiveProgress(page, editProgress(AUTOMOTIVE_EDIT.doorEnd + 0.25));
-    await expect(door).toHaveAttribute("data-frame", "9");
+    await expect(door).toHaveAttribute("data-frame", "31");
     await setAutomotiveProgress(page, editProgress(AUTOMOTIVE_EDIT.doorStart - 1));
     await expect(door).toHaveAttribute("data-frame", "0");
   });
